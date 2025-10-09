@@ -1,0 +1,50 @@
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">{{ userRole }} Dashboard</h2>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-success" role="alert">
+            <strong>Welcome to your {{ userRole }} dashboard!</strong>
+            <br>
+            <span *ngIf="userId">User ID: {{ userId }}</span>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">My Courses</h5>
+                  <p class="card-text">View and access your enrolled courses.</p>
+                  <a href="#" class="btn btn-primary">View Courses</a>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">My Grades</h5>
+                  <p class="card-text">Check your academic performance and grades.</p>
+                  <a href="#" class="btn btn-primary">View Grades</a>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">AI Insights</h5>
+                  <p class="card-text">View your personalized AI analysis and recommendations.</p>
+                  <button (click)="navigateToAIInsights()" class="btn btn-success">
+                    <i class="fas fa-brain"></i> View AI Insights
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

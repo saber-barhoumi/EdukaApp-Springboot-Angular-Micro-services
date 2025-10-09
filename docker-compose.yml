@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # Databases
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: eduka_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - eduka-network
+
+  # REMOVED: mongodb - not needed for remaining services
+
+  # Infrastructure Services
+  eureka-server:
+    build: ./infrastructure/eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - eduka-network
+
+  api-gateway:
+    build: ./infrastructure/api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+    environment:
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    networks:
+      - eduka-network
+
+  # Microservices - ONLY 2 REMAINING
+  user-management-service:
+    build: ./microservices/user-management-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql
+      - eureka-server
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/user_management_db?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: rootpassword
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    networks:
+      - eduka-network
+
+  restaurant-management-service:
+    build: ./microservices/restaurant-management-service
+    ports:
+      - "8086:8086"
+    depends_on:
+      - mysql
+      - eureka-server
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/restaurant_management_db?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: rootpassword
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    networks:
+      - eduka-network
+
+
+
+  # Frontend
+  eduka-frontend:
+    build: ./eduka-frontend
+    ports:
+      - "4200:4200"
+    depends_on:
+      - api-gateway
+    networks:
+      - eduka-network
+
+volumes:
+  mysql_data:
+ 
+
+networks:
+  eduka-network:
+    driver: bridge

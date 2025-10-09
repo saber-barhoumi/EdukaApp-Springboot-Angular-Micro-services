@@ -1,0 +1,37 @@
+<app-header-back></app-header-back>
+
+<div class="page-body-wrapper">
+  <app-sidebar-back></app-sidebar-back>
+  
+  <div class="page-body">
+    <div class="container-fluid">
+      <!-- Dashboard Cards Section -->
+      <div class="row">
+        <div class="col-12">
+          <app-dashboard-cards></app-dashboard-cards>
+        </div>
+      </div>
+      
+      <!-- Statistics Cards Section -->
+      <div class="row">
+        <div class="col-12">
+          <app-statistics-cards></app-statistics-cards>
+        </div>
+      </div>
+      
+      <!-- Main Content Section -->
+      <div class="row">
+        <div class="col-md-8">
+          <app-invoice-table></app-invoice-table>
+        </div>
+        <div class="col-md-4">
+          <app-task-list></app-task-list>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Router Outlet pour le contenu dynamique -->
+    <router-outlet></router-outlet>
+  </div>
+</div>
+
