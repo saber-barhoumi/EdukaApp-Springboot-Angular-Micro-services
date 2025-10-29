@@ -10,6 +10,7 @@ import { TeacherPageComponent } from './FrontOffice/pages-front/teacher-page/tea
 import { StudentPageComponent } from './FrontOffice/pages-front/student-page/student-page.component';
 import { ClientPageComponent } from './FrontOffice/pages-front/client-page/client-page.component';
 import { AdminPageComponent } from './BackOffice/pages-back/admin-page/admin-page.component';
+import { MenuItemsComponent } from './FrontOffice/menu-items/menu-items.component';
 // Role values match backend Role.java enum: ADMIN, TEACHER, STUDENT, ASSISTANT, CLIENT
 
 export const routes: Routes = [
@@ -62,6 +63,7 @@ export const routes: Routes = [
     // data: { roles: [Role.ADMIN] }, // Temporarily disabled for testing
     children: [
       { path: '', component: AdminPageComponent },
+      { path: 'menu-items', loadComponent: () => import('./BackOffice/menu-items-back/menu-items-back.component').then(m => m.MenuItemsBackComponent) },
       // Protected routes for BackOffice
     ]
   },
@@ -70,6 +72,9 @@ export const routes: Routes = [
     redirectTo: '/admin/1',
     pathMatch: 'full'
   },
+
+
+  { path: 'menu-items', component: MenuItemsComponent },
   {
     path: '**',
     redirectTo: ''

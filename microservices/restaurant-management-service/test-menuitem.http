@@ -1,0 +1,28 @@
+### Create menu item
+POST http://localhost:8080/api/menu-items
+Content-Type: application/json
+
+{
+  "name": "Pizza Margherita",
+  "description": "Classic pizza with tomato, mozzarella, and basil.",
+  "price": 8.99
+}
+
+### Get all menu items
+GET http://localhost:8080/api/menu-items
+
+### Get menu item by id
+GET http://localhost:8080/api/menu-items/1
+
+### Update menu item
+PUT http://localhost:8080/api/menu-items/1
+Content-Type: application/json
+
+{
+  "name": "Pizza Pepperoni",
+  "description": "Pizza with pepperoni and cheese.",
+  "price": 9.99
+}
+
+### Delete menu item
+DELETE http://localhost:8080/api/menu-items/1

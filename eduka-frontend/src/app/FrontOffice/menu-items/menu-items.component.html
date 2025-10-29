@@ -1,0 +1,36 @@
+<div class="row">
+  <ng-container *ngIf="menuItems.length > 0; else noItems">
+    <div *ngFor="let item of menuItems; let i = index" class="col-md-6 col-lg-4">
+      <div class="course-item wow fadeInUp" [attr.data-wow-delay]="'.' + ((i+1)*25) + 's'" style="visibility: visible; animation-name: fadeInUp;" [style.animation-delay]="'.' + ((i+1)*25) + 's'">
+        <div class="course-img">
+          <span class="course-tag"><i class="far fa-bookmark"></i> {{item.name}}</span>
+          <img src="../../../assets/FrontOffice/img/course/course-01.jpg" alt="">
+          <a href="#" class="btn"><i class="far fa-link"></i></a>
+        </div>
+        <div class="course-content">
+          <div class="course-meta">
+            <span class="course-meta-left"><i class="far fa-book"></i> {{item.description}}</span>
+            <div class="course-rating">
+              <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
+              <span>(4.0)</span>
+            </div>
+          </div>
+          <h4 class="course-title"><a href="#">{{item.name}}</a></h4>
+          <p class="course-text">{{item.description}}</p>
+          <div class="course-bottom">
+            <div class="course-bottom-left">
+              <span><i class="far fa-users"></i>75 Seats</span>
+              <span><i class="far fa-clock"></i>04 Years</span>
+            </div>
+            <span class="course-price">${{item.price}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-template #noItems>
+    <div class="col-12 text-center">
+      <h3>No menu items found.</h3>
+    </div>
+  </ng-template>
+</div>

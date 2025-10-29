@@ -16,7 +16,7 @@
 09. Touchpin js
 11. card-header cart close js
 */
-(function () {
+document.addEventListener('DOMContentLoaded', function () {
   const body = document.querySelector("body");
   const HTML = document.querySelector("html");
   /*=====================
@@ -31,29 +31,34 @@
   const button = document.querySelector(".tap-top");
   const displayButton = () => {
     window.addEventListener("scroll", () => {
-      if (window.scrollY > 600) {
-        button.style.display = "block";
-      } else {
-        button.style.display = "none";
+      if (button) {
+        if (window.scrollY > 600) {
+          button.style.display = "block";
+        } else {
+          button.style.display = "none";
+        }
       }
     });
   };
   const scrollToTop = () => {
-    button.addEventListener("click", () => {
-      window.scroll({
-        top: 0,
-        left: 0,
-        behavior: "smooth",
+    if (button) {
+      button.addEventListener("click", () => {
+        window.scroll({
+          top: 0,
+          left: 0,
+          behavior: "smooth",
+        });
+        console.log(event);
       });
-      console.log(event);
-    });
+    }
   };
   displayButton();
   scrollToTop();
   /*=====================
         03 Header DropDown Toggle
     ==========================*/
-  body.addEventListener("click", function (event) {
+  if (body) {
+    body.addEventListener("click", function (event) {
     const headerDropdownMenu = document.querySelectorAll(".custom-menu");
     const dropdownEl = event.target.closest(".custom-dropdown");
     const visible = dropdownEl
@@ -110,7 +115,7 @@
    06. Bookmark js
  ==========================*/
   let IconStar = document.querySelector(".icon-star");
-  if (IconStar === "starred") {
+  if (IconStar && IconStar === "starred") {
     IconStar.classList.remove("starred");
   }
   /*=====================
@@ -130,38 +135,38 @@
     });
     el.hide();
   });
-})();
+});
 /*=====================
     09. Touchpin js
     ==========================*/
 let getInputByClass = document.getElementsByClassName("input-touchspin");
-(function () {
-  Array.from(getInputByClass).forEach((elem, i) => {
-    let inputData = elem.getAttribute("value");
-    let isIncrement = elem.parentNode.querySelectorAll(".increment-touchspin");
-    let isDecrement = elem.parentNode.querySelectorAll(".decrement-touchspin");
-    if (isIncrement) {
-      isIncrement[0].addEventListener("click", () => {
-        inputData++;
+Array.from(getInputByClass).forEach((elem, i) => {
+  let inputData = elem.getAttribute("value");
+  let isIncrement = elem.parentNode.querySelectorAll(".increment-touchspin");
+  let isDecrement = elem.parentNode.querySelectorAll(".decrement-touchspin");
+  if (isIncrement && isIncrement[0]) {
+    isIncrement[0].addEventListener("click", () => {
+      inputData++;
+      elem.setAttribute("value", inputData);
+    });
+  }
+  if (isDecrement && isDecrement[0]) {
+    isDecrement[0].addEventListener("click", () => {
+      if (inputData > 0) {
+        inputData--;
         elem.setAttribute("value", inputData);
-      });
-    }
-    if (isDecrement) {
-      isDecrement[0].addEventListener("click", () => {
-        if (inputData > 0) {
-          inputData--;
-          elem.setAttribute("value", inputData);
-        }
-      });
-    }
-  });
-})();
+      }
+    });
+  }
+});
 /*=====================
     11. card-header cart close js
     ==========================*/
 document.querySelectorAll(".cartbox .btn-close").forEach(function (element) {
-  element.addEventListener("click", function (e) {
-    var tets = this.parentNode.parentNode.classList.add("d-none");
-    console.log(tets);
-  });
+  if (element) {
+    element.addEventListener("click", function (e) {
+      var tets = this.parentNode.parentNode.classList.add("d-none");
+      console.log(tets);
+    });
+  }
 });

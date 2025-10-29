@@ -1,0 +1,17 @@
+<div class="menu-items-back">
+  <h2>Menu Items (BackOffice)</h2>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <input formControlName="name" placeholder="Name" />
+    <input formControlName="description" placeholder="Description" />
+    <input formControlName="price" type="number" placeholder="Price" />
+    <button type="submit">{{ editingItem ? 'Update' : 'Add' }}</button>
+    <button type="button" *ngIf="editingItem" (click)="cancelEdit()">Cancel</button>
+  </form>
+  <ul>
+    <li *ngFor="let item of menuItems">
+      <strong>{{ item.name }}</strong> - {{ item.description }} - ${{ item.price }}
+      <button (click)="edit(item)">Edit</button>
+      <button (click)="delete(item.id!)">Delete</button>
+    </li>
+  </ul>
+</div>

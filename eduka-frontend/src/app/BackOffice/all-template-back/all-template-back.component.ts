@@ -23,7 +23,7 @@ import { TaskListComponent } from '../task-list/task-list.component';
     TaskListComponent
   ],
   templateUrl: './all-template-back.component.html',
-  styleUrl: './all-template-back.component.css'
+  styleUrls: ['./all-template-back.component.css']
 })
 export class AllTemplateBackComponent {
   

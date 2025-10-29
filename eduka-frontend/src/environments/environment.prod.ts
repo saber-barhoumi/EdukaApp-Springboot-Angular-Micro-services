@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://your-api-gateway-url.com', // Production API Gateway URL
+  apiUrl: 'https://your-nodejs-user-management-url.com', // Node.js User Management Service
   services: {
-    userManagement: 'https://your-api-gateway-url.com/api',
+    userManagement: 'https://your-nodejs-user-management-url.com/api',
     studentEvents: 'https://your-api-gateway-url.com/api',
     academicDocuments: 'https://your-api-gateway-url.com/api',
     library: 'https://your-api-gateway-url.com/api',

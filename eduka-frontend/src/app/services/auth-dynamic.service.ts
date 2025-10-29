@@ -40,9 +40,16 @@ export class AuthService {
    * Register a new user (simple, no Keycloak)
    */
   async registerSimple(user: Partial<User>, password: string): Promise<any> {
-    // Adjust endpoint as needed for your backend
+    // Ensure required fields for backend: username, email, password, role
+    // Backend expects role: 'user' or 'admin'. Default to 'user'.
+    let role = user.role;
+    if (!role || (role !== 'admin' && role !== 'user')) {
+      role = 'user';
+    }
     const registrationData = {
-      ...user,
+      username: user.username || '',
+      email: user.email || '',
+      role,
       password
     };
     try {
@@ -79,7 +86,7 @@ export class AuthService {
     accounts = accounts.filter(acc => acc.user.email !== emailOrUsername && acc.user.username !== emailOrUsername);
     localStorage.setItem('savedAccounts', JSON.stringify(accounts));
   }
-  private apiUrl = environment.apiUrl + '/api/auth';
+  private apiUrl = environment.services.userManagement + '/auth';
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -96,10 +103,10 @@ export class AuthService {
    */
   async login(email: string, password: string, rememberMe: boolean = false): Promise<void> {
     try {
-      const loginRequest: LoginRequest = {
-        email,
-        password,
-        rememberMe
+      // Patch: Send username and password as required by backend
+      const loginRequest = {
+        username: email, // Use email as username for now
+        password
       };
       const response = await this.http.post<LoginResponse>(`${this.apiUrl}/login`, loginRequest).toPromise();
       if (response && response.authenticated && response.user) {
@@ -110,15 +117,14 @@ export class AuthService {
         this.navigateByRole(response.user);
       } else {
         // Handle backend response with error message
-        const errorMessage = response?.message || 'Invalid email or password';
+        const errorMessage = response?.message || 'Invalid username or password';
         throw new Error(errorMessage);
       }
     } catch (error: any) {
       console.error('Login error:', error);
-      
       // Handle different types of errors
       if (error.status === 401) {
-        throw new Error('Invalid email or password. Please check your credentials.');
+        throw new Error('Invalid username or password. Please check your credentials.');
       } else if (error.status === 0) {
         throw new Error('Unable to connect to server. Please check your connection.');
       } else if (error.error && error.error.message) {

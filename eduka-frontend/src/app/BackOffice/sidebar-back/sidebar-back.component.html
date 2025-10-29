@@ -40,27 +40,20 @@
                       </svg>Project</a></li>
                 </ul>
               </li>
+              <!-- ...existing code... -->
               <li class="sidebar-list"> 
                 <svg class="pinned-icon">
                   <use href="https://admin.pixelstrap.net/edmin/assets/svg/iconly-sprite.svg#Pin"></use>
-                </svg><a class="sidebar-link" href="javascript:void(0)">
+                </svg>
+                <a class="sidebar-link" [routerLink]="['/admin', 1, 'menu-items']">
                   <svg class="stroke-icon">
                     <use href="https://admin.pixelstrap.net/edmin/assets/svg/iconly-sprite.svg#Pie"></use>
-                  </svg><span>Widgets</span>
-                  <svg class="feather">
-                    <use href="https://admin.pixelstrap.net/edmin/assets/svg/feather-icons/dist/feather-sprite.svg#chevron-right"></use>
-                  </svg></a>
-                <ul class="sidebar-submenu"> 
-                  <li><a href="general-widget.html"> 
-                      <svg class="svg-menu">
-                        <use href="https://admin.pixelstrap.net/edmin/assets/svg/iconly-sprite.svg#right-3"></use>
-                      </svg>General</a></li>
-                  <li><a href="chart-widget.html"> 
-                      <svg class="svg-menu">
-                        <use href="https://admin.pixelstrap.net/edmin/assets/svg/iconly-sprite.svg#right-3"></use>
-                      </svg>Chart</a></li>
-                </ul>
+                  </svg>
+                  <span>Menu Items (CRUD)</span>
+                </a>
               </li>
+              <!-- ...existing code... -->
+              <!-- Removed extra closing tags to fix template errors -->
               <li class="sidebar-list"> 
                 <svg class="pinned-icon">
                   <use href="https://admin.pixelstrap.net/edmin/assets/svg/iconly-sprite.svg#Pin"></use>

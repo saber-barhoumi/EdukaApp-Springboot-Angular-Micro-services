@@ -4,12 +4,33 @@ const jwt = require('jsonwebtoken');
 
 exports.login = async (req, res) => {
   const { username, password } = req.body;
-  const user = await User.findOne({ username });
-  if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+  console.log('Login payload:', req.body);
+  let user = await User.findOne({ username });
+  if (!user && username) {
+    user = await User.findOne({ email: username });
+  }
+  console.log('User found:', user ? user.username : null);
+  if (!user) {
+    console.log('No user found for username/email:', username);
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
   const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
+  console.log('Password valid:', valid);
+  if (!valid) {
+    console.log('Password mismatch for user:', user.username);
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
   const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
-  res.json({ token });
+  // Patch: Return full response for Angular
+  const userObj = user.toObject();
+  delete userObj.password;
+  res.json({
+    authenticated: true,
+    success: true,
+    message: 'Login successful',
+    user: userObj,
+    token
+  });
 };
 
 exports.register = async (req, res) => {
