@@ -13,13 +13,13 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     
-    List<Order> findByUserId(Long userId);
+    List<Order> findByUserId(String userId);  // MongoDB ObjectId
     
     List<Order> findByRestaurantId(Long restaurantId);
     
     List<Order> findByStatus(OrderStatus status);
     
-    List<Order> findByUserIdAndStatus(Long userId, OrderStatus status);
+    List<Order> findByUserIdAndStatus(String userId, OrderStatus status);  // MongoDB ObjectId
     
     List<Order> findByRestaurantIdAndStatus(Long restaurantId, OrderStatus status);
     

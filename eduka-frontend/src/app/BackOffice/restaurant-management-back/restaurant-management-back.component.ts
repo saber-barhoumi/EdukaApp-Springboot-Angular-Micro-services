@@ -3,17 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RestaurantService, Restaurant } from '../../services/restaurant.service';
 import { UserService, User } from '../../services/user.service';
-
-// Order interface
-export interface Order {
-  id?: number;
-  userId: number;
-  restaurantId: number;
-  totalAmount?: number;
-  status: string;
-  orderDate?: Date;
-  items?: any[];
-}
+import { OrderService, Order, OrderStatus } from '../../services/order.service';
 
 @Component({
   selector: 'app-restaurant-management-back',
@@ -53,7 +43,7 @@ export class RestaurantManagementBackComponent implements OnInit {
   orderSearchTerm = '';
   filterStatus = '';
   filterRestaurantId: number | null = null;
-  orderStatuses = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'DELIVERED', 'CANCELLED'];
+  orderStatuses = Object.values(OrderStatus);
   
   // Order statistics
   totalOrders = 0;
@@ -68,7 +58,8 @@ export class RestaurantManagementBackComponent implements OnInit {
 
   constructor(
     private restaurantService: RestaurantService,
-    private userService: UserService
+    private userService: UserService,
+    private orderService: OrderService
   ) {}
 
   ngOnInit(): void {
@@ -76,12 +67,18 @@ export class RestaurantManagementBackComponent implements OnInit {
   }
 
   loadRestaurants(): void {
+    console.log('Loading restaurants...');
     this.restaurantService.getAllRestaurants().subscribe({
       next: (data) => {
+        console.log('Restaurants loaded from database:', data);
+        console.log('Total restaurants:', data.length);
         this.restaurants = data;
         this.filteredRestaurants = data;
       },
-      error: (error) => console.error('Error loading restaurants:', error)
+      error: (error) => {
+        console.error('Error loading restaurants:', error);
+        alert('Failed to load restaurants: ' + (error.error?.message || error.message));
+      }
     });
   }
 
@@ -97,28 +94,20 @@ export class RestaurantManagementBackComponent implements OnInit {
   // ===================== ORDER MANAGEMENT METHODS =====================
   
   loadOrders(): void {
-    // Mock data for now - replace with actual API call
-    // this.orderService.getAllOrders().subscribe(...)
-    this.orders = this.generateMockOrders();
-    this.filteredOrders = [...this.orders];
-    this.calculateStatistics();
-  }
-
-  generateMockOrders(): Order[] {
-    // Generate mock orders - replace with actual API call
-    const mockOrders: Order[] = [];
-    for (let i = 1; i <= 50; i++) {
-      const restaurantId = this.restaurants[Math.floor(Math.random() * this.restaurants.length)]?.id || 1;
-      mockOrders.push({
-        id: i,
-        userId: Math.floor(Math.random() * 100) + 1,
-        restaurantId: restaurantId,
-        totalAmount: Math.random() * 100 + 10,
-        status: this.orderStatuses[Math.floor(Math.random() * this.orderStatuses.length)],
-        orderDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000)
-      });
-    }
-    return mockOrders;
+    this.orderService.getAllOrders().subscribe({
+      next: (data) => {
+        this.orders = data;
+        this.filteredOrders = [...this.orders];
+        this.calculateStatistics();
+      },
+      error: (error) => {
+        console.error('Error loading orders:', error);
+        // Fallback to empty array if error
+        this.orders = [];
+        this.filteredOrders = [];
+        this.calculateStatistics();
+      }
+    });
   }
 
   filterOrders(): void {
@@ -127,7 +116,7 @@ export class RestaurantManagementBackComponent implements OnInit {
         order.id?.toString().includes(this.orderSearchTerm) ||
         order.userId.toString().includes(this.orderSearchTerm);
       const matchesStatus = !this.filterStatus || order.status === this.filterStatus;
-      const matchesRestaurant = !this.filterRestaurantId || order.restaurantId === this.filterRestaurantId;
+      const matchesRestaurant = !this.filterRestaurantId || order.restaurant?.id === this.filterRestaurantId;
       return matchesSearch && matchesStatus && matchesRestaurant;
     });
     this.calculateStatistics();
@@ -136,33 +125,56 @@ export class RestaurantManagementBackComponent implements OnInit {
   calculateStatistics(): void {
     this.totalOrders = this.filteredOrders.length;
     this.totalRevenue = this.filteredOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
-    this.pendingOrders = this.filteredOrders.filter(o => o.status === 'PENDING').length;
-    this.completedOrders = this.filteredOrders.filter(o => o.status === 'DELIVERED').length;
+    this.pendingOrders = this.filteredOrders.filter(o => o.status === OrderStatus.PENDING).length;
+    this.completedOrders = this.filteredOrders.filter(o => o.status === OrderStatus.COMPLETED || o.status === OrderStatus.DELIVERED).length;
   }
 
   updateOrderStatus(order: Order): void {
-    // Mock implementation - replace with actual API call
-    console.log('Updating order status:', order);
-    alert(`Order #${order.id} status updated to ${order.status}`);
-    this.calculateStatistics();
+    if (!order.id || !order.status) return;
+    
+    this.orderService.updateOrderStatus(order.id, order.status as OrderStatus).subscribe({
+      next: () => {
+        alert(`Order #${order.id} status updated to ${order.status}`);
+        this.loadOrders(); // Reload to get updated data
+      },
+      error: (error) => {
+        console.error('Error updating order status:', error);
+        alert('Failed to update order status: ' + (error.error?.message || error.message));
+        this.loadOrders(); // Reload to reset any changes
+      }
+    });
   }
 
   viewOrderDetails(order: Order): void {
-    alert(`Order Details:\nID: ${order.id}\nUser: ${order.userId}\nRestaurant: ${this.getRestaurantName(order.restaurantId)}\nTotal: $${order.totalAmount?.toFixed(2)}\nStatus: ${order.status}`);
+    if (!order.id) return;
+    
+    this.orderService.getOrderWithItems(order.id).subscribe({
+      next: (fullOrder) => {
+        const itemsList = fullOrder.items?.map(item => `- ${item.name} ($${item.price})`).join('\n') || 'No items';
+        alert(`Order Details:\nID: ${fullOrder.id}\nUser: ${fullOrder.userId}\nRestaurant: ${this.getRestaurantName(fullOrder.restaurant?.id)}\nItems:\n${itemsList}\nTotal: $${fullOrder.totalAmount?.toFixed(2)}\nStatus: ${fullOrder.status}`);
+      },
+      error: (error) => {
+        console.error('Error loading order details:', error);
+        alert('Failed to load order details');
+      }
+    });
   }
 
-  getRestaurantName(restaurantId: number): string {
+  getRestaurantName(restaurantId: number | undefined): string {
+    if (!restaurantId) return 'Unknown';
     const restaurant = this.restaurants.find(r => r.id === restaurantId);
     return restaurant?.name || 'Unknown';
   }
 
-  getStatusClass(status: string): string {
+  getStatusClass(status: string | OrderStatus | undefined): string {
+    if (!status) return 'bg-secondary';
     const statusClasses: { [key: string]: string } = {
       'PENDING': 'bg-warning',
       'CONFIRMED': 'bg-info',
       'PREPARING': 'bg-primary',
       'READY': 'bg-success',
       'DELIVERED': 'bg-success',
+      'COMPLETED': 'bg-success',
       'CANCELLED': 'bg-danger'
     };
     return statusClasses[status] || 'bg-secondary';
@@ -231,26 +243,35 @@ export class RestaurantManagementBackComponent implements OnInit {
   saveRestaurant(): void {
     if (this.isEditing && this.newRestaurant.id) {
       this.restaurantService.updateRestaurant(this.newRestaurant.id, this.newRestaurant).subscribe({
-        next: () => {
-          this.loadRestaurants();
+        next: (updatedRestaurant) => {
+          console.log('Restaurant updated:', updatedRestaurant);
+          // Update the restaurant in the local array immediately
+          const index = this.restaurants.findIndex(r => r.id === updatedRestaurant.id);
+          if (index !== -1) {
+            this.restaurants[index] = updatedRestaurant;
+            this.filterRestaurants(); // Re-apply filters
+          }
           this.closeModal();
           alert('Restaurant updated successfully!');
         },
         error: (error) => {
           console.error('Error updating restaurant:', error);
-          alert('Failed to update restaurant');
+          alert('Failed to update restaurant: ' + (error.error?.message || error.message));
         }
       });
     } else {
       this.restaurantService.createRestaurant(this.newRestaurant).subscribe({
-        next: () => {
-          this.loadRestaurants();
+        next: (createdRestaurant) => {
+          console.log('Restaurant created:', createdRestaurant);
+          // Add the new restaurant to the local array immediately
+          this.restaurants.push(createdRestaurant);
+          this.filterRestaurants(); // Re-apply filters to include the new restaurant
           this.closeModal();
-          alert('Restaurant created successfully!');
+          alert('Restaurant created successfully! ID: ' + createdRestaurant.id);
         },
         error: (error) => {
           console.error('Error creating restaurant:', error);
-          alert('Failed to create restaurant');
+          alert('Failed to create restaurant: ' + (error.error?.message || error.message));
         }
       });
     }
@@ -260,12 +281,15 @@ export class RestaurantManagementBackComponent implements OnInit {
     if (confirm('Are you sure you want to delete this restaurant?')) {
       this.restaurantService.deleteRestaurant(id).subscribe({
         next: () => {
-          this.loadRestaurants();
+          console.log('Restaurant deleted:', id);
+          // Remove from local array immediately
+          this.restaurants = this.restaurants.filter(r => r.id !== id);
+          this.filterRestaurants(); // Re-apply filters
           alert('Restaurant deleted successfully!');
         },
         error: (error) => {
           console.error('Error deleting restaurant:', error);
-          alert('Failed to delete restaurant');
+          alert('Failed to delete restaurant: ' + (error.error?.message || error.message));
         }
       });
     }
@@ -275,10 +299,19 @@ export class RestaurantManagementBackComponent implements OnInit {
     const updated = { ...restaurant, isActive: !restaurant.isActive };
     if (restaurant.id) {
       this.restaurantService.updateRestaurant(restaurant.id, updated).subscribe({
-        next: () => {
-          this.loadRestaurants();
+        next: (updatedRestaurant) => {
+          console.log('Restaurant status updated:', updatedRestaurant);
+          // Update in local array
+          const index = this.restaurants.findIndex(r => r.id === updatedRestaurant.id);
+          if (index !== -1) {
+            this.restaurants[index] = updatedRestaurant;
+            this.filterRestaurants();
+          }
         },
-        error: (error) => console.error('Error updating status:', error)
+        error: (error) => {
+          console.error('Error updating status:', error);
+          alert('Failed to update status: ' + (error.error?.message || error.message));
+        }
       });
     }
   }

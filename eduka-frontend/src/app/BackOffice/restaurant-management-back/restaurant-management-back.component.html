@@ -280,10 +280,10 @@
                 <tr *ngFor="let order of filteredOrders">
                   <td><strong>#{{ order.id }}</strong></td>
                   <td>{{ order.userId }}</td>
-                  <td>{{ getRestaurantName(order.restaurantId) }}</td>
+                  <td>{{ getRestaurantName(order.restaurant?.id) }}</td>
                   <td><strong>\${{ order.totalAmount?.toFixed(2) }}</strong></td>
                   <td>
-                    <span class="badge" [ngClass]="getStatusClass(order.status)">
+                    <span class="badge" [ngClass]="getStatusClass(order.status || '')">
                       {{ order.status }}
                     </span>
                   </td>

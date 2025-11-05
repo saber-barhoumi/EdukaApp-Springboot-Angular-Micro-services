@@ -1,5 +1,6 @@
 package com.eduka.restaurant.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Order {
     
     @Id
@@ -21,18 +23,20 @@ public class Order {
     private Long id;
     
     @Column(name = "user_id", nullable = false)
-    private Long userId; // Reference to User from User Management Service
+    private String userId; // MongoDB ObjectId from Node.js User Management Service
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "restaurant_id", nullable = false)
+    @JsonIgnoreProperties({"menuItems", "orders", "assignedUserIds"})
     private Restaurant restaurant;
     
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "order_menu_items",
         joinColumns = @JoinColumn(name = "order_id"),
         inverseJoinColumns = @JoinColumn(name = "menu_item_id")
     )
+    @JsonIgnoreProperties({"restaurant"})
     private List<MenuItem> items = new ArrayList<>();
     
     @Column(nullable = false)

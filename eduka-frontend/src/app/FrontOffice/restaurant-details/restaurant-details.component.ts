@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RestaurantService, Restaurant } from '../../services/restaurant.service';
-import { OrderService, MenuItem, CreateOrderRequest } from '../../services/order.service';
+import { MenuItemService, MenuItem } from '../../services/menu-item.service';
 
 interface CartItem {
   menuItem: MenuItem;
@@ -30,7 +30,7 @@ export class RestaurantDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private restaurantService: RestaurantService,
-    private orderService: OrderService
+    private menuItemService: MenuItemService
   ) {}
 
   ngOnInit(): void {
@@ -51,7 +51,7 @@ export class RestaurantDetailsComponent implements OnInit {
   }
 
   loadMenuItems(restaurantId: number): void {
-    this.orderService.getAvailableMenuItems(restaurantId).subscribe({
+    this.menuItemService.getAvailableMenuItems(restaurantId).subscribe({
       next: (data: MenuItem[]) => {
         this.menuItems = data;
         this.filteredMenuItems = data;
@@ -96,7 +96,8 @@ export class RestaurantDetailsComponent implements OnInit {
     }
   }
 
-  getCartItemQuantity(menuItemId: number): number {
+  getCartItemQuantity(menuItemId: number | undefined): number {
+    if (!menuItemId) return 0;
     const item = this.cart.find(i => i.menuItem.id === menuItemId);
     return item ? item.quantity : 0;
   }

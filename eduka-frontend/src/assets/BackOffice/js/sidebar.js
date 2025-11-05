@@ -1,6 +1,12 @@
 (function () {
   const body = document.querySelector("body");
   const wrapper = document.querySelector(".page-wrapper");
+  
+  // Exit early if BackOffice elements don't exist (e.g., on FrontOffice pages)
+  if (!wrapper) {
+    return;
+  }
+  
   // Get all the sidebar-list elements
   const sidebarListItems = document.querySelectorAll(".sidebar-link");
   // Add onclick event listener to each sidebar-list item
@@ -86,11 +92,13 @@
   }
   // Sidebar toggle js
   const sidebarToggle = document.querySelector(".toggle-sidebar");
-  sidebarToggle.addEventListener("click", function () {
-    wrapper.classList.toggle("sidebar-close");
-    sidebarToggle.classList.toggle("close");
-    const wrapperClose = wrapper.classList.contains("sidebar-close");
-  });
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener("click", function () {
+      wrapper.classList.toggle("sidebar-close");
+      sidebarToggle.classList.toggle("close");
+      const wrapperClose = wrapper.classList.contains("sidebar-close");
+    });
+  }
   // Sidebar pinned menu
   const pinTitle = document.querySelector(".pin-title");
   let pinIcon = document.querySelectorAll(".sidebar-list .pinned-icon");

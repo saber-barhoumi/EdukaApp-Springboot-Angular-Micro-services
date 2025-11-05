@@ -35,23 +35,11 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Clear any cached user data to prevent routing issues
-    this.clearCachedUserData();
-    
+    // Subscribe to current user state
     this.authService.currentUser$.subscribe((user: User | null) => {
       this.currentUser = user;
       this.isLoggedIn = user !== null;
     });
-  }
-
-  private clearCachedUserData(): void {
-    // Clear localStorage and sessionStorage to prevent cached user data issues
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('userId');
-    sessionStorage.removeItem('currentUser');
-    sessionStorage.removeItem('userRole');
-    sessionStorage.removeItem('userId');
   }
 
   async login(): Promise<void> {
@@ -66,7 +54,13 @@ export class LoginComponent implements OnInit {
     try {
       const { email, password, rememberMe } = this.loginForm.value;
       await this.authService.login(email, password, rememberMe);
-      // Navigation is handled automatically in the auth service based on user role
+      
+      // Debug: Verify user is stored
+      const storedUser = localStorage.getItem('currentUser');
+      const currentUser = this.authService.getCurrentUser();
+      console.log('=== After Login ===');
+      console.log('localStorage currentUser:', storedUser);
+      console.log('authService.getCurrentUser():', currentUser);
       console.log('Login successful, navigation handled by auth service');
     } catch (error: any) {
       console.error('Login failed:', error);

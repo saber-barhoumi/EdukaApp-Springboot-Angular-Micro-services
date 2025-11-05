@@ -6,13 +6,14 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface User {
-  id: number;
+  id?: number;        // Spring Boot/SQL uses id
+  _id?: string;       // MongoDB/Node.js uses _id
   username: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   role: string; // Matches backend Role.java enum values
-  active: boolean;
+  active?: boolean;
   age?: number;
   phoneNumber?: string;
   gender?: string;
@@ -95,8 +96,14 @@ export class AuthService {
   constructor(private http: HttpClient, private router: Router) {
     // Check if user is stored in localStorage
     const storedUser = localStorage.getItem('currentUser');
+    console.log('=== AuthService Constructor ===');
+    console.log('Stored user from localStorage:', storedUser);
     if (storedUser) {
-      this.currentUserSubject.next(JSON.parse(storedUser));
+      const parsedUser = JSON.parse(storedUser);
+      this.currentUserSubject.next(parsedUser);
+      console.log('User loaded into BehaviorSubject:', parsedUser);
+    } else {
+      console.log('No stored user found');
     }
   }
 
@@ -170,36 +177,53 @@ export class AuthService {
   /**
    * Logout user
    */
-  async logout(): Promise<void> {
-    try {
-      // Call backend logout endpoint
-      await this.http.post(`${this.apiUrl}/logout`, {}).toPromise();
-    } catch (error) {
-      console.warn('Logout request failed:', error);
-    } finally {
-      // Clear local storage and state regardless of backend response
-      localStorage.removeItem('currentUser');
-      this.currentUserSubject.next(null);
-      this.router.navigate(['/login']);
-    }
+  logout(): void {
+    // Clear local storage and state
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('authToken');
+    this.currentUserSubject.next(null);
+    
+    // Navigate to login page
+    this.router.navigate(['/login']);
+    
+    console.log('User logged out successfully');
   }
 
   /**
    * Get current user
    */
   getCurrentUser(): User | null {
-    return this.currentUserSubject.value;
+    const user = this.currentUserSubject.value;
+    console.log('getCurrentUser() called, returning:', user);
+    return user;
+  }
+
+  /**
+   * Get user ID (supports both MongoDB _id and SQL id)
+   */
+  getUserId(): string | number | null {
+    const user = this.getCurrentUser();
+    if (!user) return null;
+    // MongoDB uses _id (string), SQL uses id (number)
+    return user._id || user.id || null;
   }
 
     /**
      * Register account info in localStorage for quick login
      */
     registerAccountToLocalStorage(user: User, token?: string): void {
+      console.log('=== registerAccountToLocalStorage ===');
+      console.log('Saving user:', user);
+      console.log('Token:', token);
+      
       localStorage.setItem('currentUser', JSON.stringify(user));
       if (token) {
         localStorage.setItem('authToken', token);
       }
       this.currentUserSubject.next(user);
+      
+      console.log('User saved to localStorage and BehaviorSubject');
+      console.log('BehaviorSubject value:', this.currentUserSubject.value);
     }
 
   /**

@@ -1,5 +1,7 @@
 package com.eduka.restaurant.service;
 
+import com.eduka.restaurant.client.UserClient;
+import com.eduka.restaurant.dto.UserDTO;
 import com.eduka.restaurant.model.MenuItem;
 import com.eduka.restaurant.model.Order;
 import com.eduka.restaurant.model.OrderStatus;
@@ -10,6 +12,7 @@ import com.eduka.restaurant.repository.RestaurantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import feign.FeignException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,7 +30,33 @@ public class OrderService {
     @Autowired
     private MenuItemRepository menuItemRepository;
     
+    @Autowired
+    private UserClient userClient;
+    
+    /**
+     * Validate that a user exists before creating an order
+     * @param userId MongoDB ObjectId to validate
+     * @throws RuntimeException if user does not exist or service is unavailable
+     */
+    private void validateUser(String userId) {
+        try {
+            Boolean isValid = userClient.validateUser(userId);
+            if (isValid == null || !isValid) {
+                throw new RuntimeException("User not found with id: " + userId);
+            }
+        } catch (FeignException.NotFound e) {
+            throw new RuntimeException("User not found with id: " + userId);
+        } catch (FeignException e) {
+            throw new RuntimeException("Unable to validate user. User service may be unavailable: " + e.getMessage());
+        }
+    }
+    
     public Order createOrder(Order order, Long restaurantId, List<Long> menuItemIds) {
+        // Validate user exists before creating order
+        if (order.getUserId() != null) {
+            validateUser(order.getUserId());
+        }
+        
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
             .orElseThrow(() -> new RuntimeException("Restaurant not found with id: " + restaurantId));
         
@@ -94,7 +123,7 @@ public class OrderService {
         return orderRepository.findAll();
     }
     
-    public List<Order> getOrdersByUserId(Long userId) {
+    public List<Order> getOrdersByUserId(String userId) {
         return orderRepository.findByUserId(userId);
     }
     
@@ -106,7 +135,7 @@ public class OrderService {
         return orderRepository.findByStatus(status);
     }
     
-    public List<Order> getOrdersByUserIdAndStatus(Long userId, OrderStatus status) {
+    public List<Order> getOrdersByUserIdAndStatus(String userId, OrderStatus status) {
         return orderRepository.findByUserIdAndStatus(userId, status);
     }
     

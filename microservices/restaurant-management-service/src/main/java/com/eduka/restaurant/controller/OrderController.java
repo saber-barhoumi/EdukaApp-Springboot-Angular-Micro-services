@@ -1,5 +1,6 @@
 package com.eduka.restaurant.controller;
 
+import com.eduka.restaurant.dto.CreateOrderRequest;
 import com.eduka.restaurant.model.Order;
 import com.eduka.restaurant.model.OrderStatus;
 import com.eduka.restaurant.service.OrderService;
@@ -23,18 +24,13 @@ public class OrderController {
     private OrderService orderService;
     
     @PostMapping
-    public ResponseEntity<Order> createOrder(
-            @RequestBody Map<String, Object> request) {
+    public ResponseEntity<Order> createOrder(@RequestBody CreateOrderRequest request) {
         Order order = new Order();
-        order.setUserId(Long.valueOf(request.get("userId").toString()));
-        order.setNotes((String) request.get("notes"));
-        order.setDeliveryAddress((String) request.get("deliveryAddress"));
+        order.setUserId(request.getUserId());  // Now accepts String MongoDB ObjectId
+        order.setNotes(request.getNotes());
+        order.setDeliveryAddress(request.getDeliveryAddress());
         
-        Long restaurantId = Long.valueOf(request.get("restaurantId").toString());
-        @SuppressWarnings("unchecked")
-        List<Long> menuItemIds = (List<Long>) request.get("menuItemIds");
-        
-        Order created = orderService.createOrder(order, restaurantId, menuItemIds);
+        Order created = orderService.createOrder(order, request.getRestaurantId(), request.getMenuItemIds());
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
     
@@ -79,7 +75,7 @@ public class OrderController {
     }
     
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Order>> getOrdersByUser(@PathVariable Long userId) {
+    public ResponseEntity<List<Order>> getOrdersByUser(@PathVariable String userId) {
         List<Order> orders = orderService.getOrdersByUserId(userId);
         return ResponseEntity.ok(orders);
     }
@@ -98,7 +94,7 @@ public class OrderController {
     
     @GetMapping("/user/{userId}/status/{status}")
     public ResponseEntity<List<Order>> getOrdersByUserAndStatus(
-            @PathVariable Long userId, 
+            @PathVariable String userId, 
             @PathVariable OrderStatus status) {
         List<Order> orders = orderService.getOrdersByUserIdAndStatus(userId, status);
         return ResponseEntity.ok(orders);

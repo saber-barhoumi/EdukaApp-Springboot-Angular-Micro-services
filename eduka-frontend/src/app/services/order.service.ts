@@ -41,7 +41,7 @@ export enum OrderStatus {
 }
 
 export interface CreateOrderRequest {
-  userId: number;
+  userId: number | string;  // Support both MongoDB string and SQL number
   restaurantId: number;
   menuItemIds: number[];
   notes?: string;

@@ -1,17 +1,251 @@
-<div class="menu-items-back">
-  <h2>Menu Items (BackOffice)</h2>
-  <form [formGroup]="form" (ngSubmit)="submit()">
-    <input formControlName="name" placeholder="Name" />
-    <input formControlName="description" placeholder="Description" />
-    <input formControlName="price" type="number" placeholder="Price" />
-    <button type="submit">{{ editingItem ? 'Update' : 'Add' }}</button>
-    <button type="button" *ngIf="editingItem" (click)="cancelEdit()">Cancel</button>
-  </form>
-  <ul>
-    <li *ngFor="let item of menuItems">
-      <strong>{{ item.name }}</strong> - {{ item.description }} - ${{ item.price }}
-      <button (click)="edit(item)">Edit</button>
-      <button (click)="delete(item.id!)">Delete</button>
-    </li>
-  </ul>
+<div class="container-fluid">
+  <div class="page-header">
+    <div class="row">
+      <div class="col-sm-6">
+        <h3>Menu Items Management</h3>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="javascript:void(0)">Dashboard</a></li>
+          <li class="breadcrumb-item active">Menu Items</li>
+        </ol>
+      </div>
+      <div class="col-sm-6">
+        <!-- Page Header Right -->
+      </div>
+    </div>
+  </div>
 </div>
+
+<div class="container-fluid">
+  <div class="row">
+    <!-- Form Card -->
+    <div class="col-sm-12">
+      <div class="card">
+        <div class="card-header pb-0">
+          <h5>{{ editingItem ? 'Edit Menu Item' : 'Add New Menu Item' }}</h5>
+          <span>Fill in the details below to {{ editingItem ? 'update' : 'create' }} a menu item</span>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="form" (ngSubmit)="submit()">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label" for="restaurant">Restaurant <span class="text-danger">*</span></label>
+                <select class="form-select" id="restaurant" formControlName="restaurantId">
+                  <option [ngValue]="null" disabled>Select Restaurant</option>
+                  <option *ngFor="let restaurant of restaurants" [ngValue]="restaurant.id">
+                    {{ restaurant.name }}
+                  </option>
+                </select>
+                <div class="invalid-feedback d-block" *ngIf="form.get('restaurantId')?.invalid && form.get('restaurantId')?.touched">
+                  <i class="fa fa-exclamation-circle"></i> Restaurant is required
+                </div>
+              </div>
+              
+              <div class="col-md-6 mb-3">
+                <label class="form-label" for="name">Item Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="name" formControlName="name" placeholder="Enter item name">
+                <div class="invalid-feedback d-block" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
+                  <i class="fa fa-exclamation-circle"></i> Name is required
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label" for="category">Category <span class="text-danger">*</span></label>
+                <select class="form-select" id="category" formControlName="category">
+                  <option value="" disabled>Select Category</option>
+                  <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                </select>
+                <div class="invalid-feedback d-block" *ngIf="form.get('category')?.invalid && form.get('category')?.touched">
+                  <i class="fa fa-exclamation-circle"></i> Category is required
+                </div>
+              </div>
+              
+              <div class="col-md-4 mb-3">
+                <label class="form-label" for="price">Price ($) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" class="form-control" id="price" formControlName="price" placeholder="0.00" step="0.01" min="0">
+                </div>
+                <div class="invalid-feedback d-block" *ngIf="form.get('price')?.invalid && form.get('price')?.touched">
+                  <i class="fa fa-exclamation-circle"></i> Valid price is required
+                </div>
+              </div>
+              
+              <div class="col-md-4 mb-3">
+                <label class="form-label" for="preparationTime">Prep Time (minutes)</label>
+                <input type="number" class="form-control" id="preparationTime" formControlName="preparationTime" placeholder="15" min="0">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <label class="form-label" for="description">Description</label>
+                <textarea class="form-control" id="description" formControlName="description" rows="3" placeholder="Describe the menu item..."></textarea>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-9 mb-3">
+                <label class="form-label" for="imageUrl">Image URL</label>
+                <input type="url" class="form-control" id="imageUrl" formControlName="imageUrl" placeholder="https://example.com/image.jpg">
+              </div>
+              
+              <div class="col-md-3 mb-3">
+                <label class="form-label d-block">Availability</label>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" id="isAvailable" formControlName="isAvailable">
+                  <label class="form-check-label" for="isAvailable">
+                    Item is available
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mt-4">
+              <div class="col-md-12">
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary btn-lg me-2">
+                    <i class="fa fa-save me-2"></i>{{ editingItem ? 'Update' : 'Create' }} Menu Item
+                  </button>
+                  <button type="button" class="btn btn-light btn-lg" *ngIf="editingItem" (click)="cancelEdit()">
+                    <i class="fa fa-times me-2"></i>Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters and Table Card -->
+    <div class="col-sm-12 mt-4">
+      <div class="card">
+        <div class="card-header pb-0">
+          <h5>Menu Items List</h5>
+          <span>Search and filter menu items</span>
+        </div>
+        <div class="card-body">
+          <!-- Filters -->
+          <div class="row mb-4">
+            <div class="col-md-3 mb-2">
+              <div class="input-group">
+                <span class="input-group-text"><i class="fa fa-search"></i></span>
+                <input type="text" class="form-control" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" placeholder="Search by name...">
+              </div>
+            </div>
+            
+            <div class="col-md-3 mb-2">
+              <select class="form-select" [(ngModel)]="selectedRestaurantId" (ngModelChange)="loadMenuItemsByRestaurant($any($event))">
+                <option [ngValue]="null">All Restaurants</option>
+                <option *ngFor="let restaurant of restaurants" [ngValue]="restaurant.id">
+                  {{ restaurant.name }}
+                </option>
+              </select>
+            </div>
+            
+            <div class="col-md-3 mb-2">
+              <select class="form-select" [(ngModel)]="filterCategory" (ngModelChange)="onCategoryChange()">
+                <option value="all">All Categories</option>
+                <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+              </select>
+            </div>
+            
+            <div class="col-md-3 mb-2">
+              <select class="form-select" [(ngModel)]="filterAvailability" (ngModelChange)="onAvailabilityChange()">
+                <option value="all">All Status</option>
+                <option value="available">Available Only</option>
+                <option value="unavailable">Unavailable Only</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr class="border-bottom-primary">
+                  <th scope="col">#ID</th>
+                  <th scope="col">Restaurant</th>
+                  <th scope="col">Item Details</th>
+                  <th scope="col">Category</th>
+                  <th scope="col">Price</th>
+                  <th scope="col">Prep Time</th>
+                  <th scope="col">Status</th>
+                  <th scope="col" class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of filteredMenuItems" class="align-middle">
+                  <td><strong>#{{ item.id }}</strong></td>
+                  <td>
+                    <span class="badge badge-light-primary">{{ getRestaurantName(item.restaurantId) }}</span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="flex-shrink-0">
+                        <img *ngIf="item.imageUrl" [src]="item.imageUrl" alt="{{ item.name }}" 
+                             class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;"
+                             onerror="this.style.display='none'">
+                        <div *ngIf="!item.imageUrl" class="bg-light d-flex align-items-center justify-content-center" 
+                             style="width: 50px; height: 50px;">
+                          <i class="fa fa-image text-muted"></i>
+                        </div>
+                      </div>
+                      <div class="flex-grow-1 ms-3">
+                        <h6 class="mb-0">{{ item.name }}</h6>
+                        <small class="text-muted">{{ item.description || 'No description' }}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="badge badge-info">{{ item.category }}</span></td>
+                  <td><strong>${{ item.price.toFixed(2) }}</strong></td>
+                  <td>{{ item.preparationTime || '-' }} min</td>
+                  <td>
+                    <span class="badge" [ngClass]="item.isAvailable ? 'badge-success' : 'badge-danger'">
+                      <i class="fa" [ngClass]="item.isAvailable ? 'fa-check-circle' : 'fa-times-circle'"></i>
+                      {{ item.isAvailable ? 'Available' : 'Unavailable' }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <div class="btn-group" role="group">
+                      <button class="btn btn-sm btn-warning" (click)="edit(item)" title="Edit">
+                        <i class="fa fa-edit"></i>
+                      </button>
+                      <button class="btn btn-sm btn-info" (click)="toggleAvailability(item)" 
+                              title="Toggle Availability">
+                        <i class="fa fa-power-off"></i>
+                      </button>
+                      <button class="btn btn-sm btn-danger" (click)="delete(item.id)" title="Delete">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="filteredMenuItems.length === 0">
+                  <td colspan="8" class="text-center py-5">
+                    <i class="fa fa-inbox fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No menu items found</h5>
+                    <p class="text-muted">Try adjusting your filters or create a new menu item</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Summary -->
+          <div class="row mt-3" *ngIf="filteredMenuItems.length > 0">
+            <div class="col-md-12">
+              <p class="text-muted mb-0">
+                <i class="fa fa-info-circle"></i> 
+                Showing <strong>{{ filteredMenuItems.length }}</strong> of <strong>{{ menuItems.length }}</strong> menu items
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

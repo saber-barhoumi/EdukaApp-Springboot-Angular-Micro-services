@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateOrderRequest {
-    private Long userId;
+    private String userId; // MongoDB ObjectId from Node.js auth
     private Long restaurantId;
     private List<Long> menuItemIds;
     private String notes;
