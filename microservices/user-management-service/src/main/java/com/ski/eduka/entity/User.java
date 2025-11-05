@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -55,6 +57,12 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
     
+    // Many-to-Many: User <-> Restaurant (assigned restaurants)
+    @ElementCollection
+    @CollectionTable(name = "user_restaurants", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "restaurant_id")
+    private Set<Long> assignedRestaurantIds = new HashSet<>();
+    
     // AI Analysis fields (for students)
     @Column(name = "last_analysis_date")
     private LocalDateTime lastAnalysisDate;
@@ -89,6 +97,15 @@ public class User {
     // Helper method for isActive
     public boolean isActive() {
         return Boolean.TRUE.equals(isActive);
+    }
+    
+    // Helper methods for restaurant management
+    public void assignRestaurant(Long restaurantId) {
+        assignedRestaurantIds.add(restaurantId);
+    }
+    
+    public void unassignRestaurant(Long restaurantId) {
+        assignedRestaurantIds.remove(restaurantId);
     }
     
     @PreUpdate

@@ -49,9 +49,23 @@
                   <svg class="stroke-icon">
                     <use href="https://admin.pixelstrap.net/edmin/assets/svg/iconly-sprite.svg#Pie"></use>
                   </svg>
-                  <span>Menu Items (CRUD)</span>
+                  <span>Menu Items</span>
                 </a>
               </li>
+              
+              <!-- Restaurant Management - Single Unified Page -->
+              <li class="sidebar-list"> 
+                <svg class="pinned-icon">
+                  <use href="https://admin.pixelstrap.net/edmin/assets/svg/iconly-sprite.svg#Pin"></use>
+                </svg>
+                <a class="sidebar-link" [routerLink]="['/admin', 1, 'restaurant-management']">
+                  <svg class="stroke-icon">
+                    <use href="https://admin.pixelstrap.net/edmin/assets/svg/iconly-sprite.svg#Bag"></use>
+                  </svg>
+                  <span>Restaurant Management</span>
+                </a>
+              </li>
+              
               <!-- ...existing code... -->
               <!-- Removed extra closing tags to fix template errors -->
               <li class="sidebar-list"> 

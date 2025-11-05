@@ -74,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const dropdownMenu = dropdownEl.querySelector(".custom-menu");
     if (!visible) dropdownMenu.classList.add("show");
   });
+  }
   /*=====================
      04. Header search js
    ==========================*/
@@ -136,6 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
     el.hide();
   });
 });
+
 /*=====================
     09. Touchpin js
     ==========================*/

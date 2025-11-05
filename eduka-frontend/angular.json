@@ -23,9 +23,32 @@
               "src/assets"
             ],
             "styles": [
+              "src/assets/FrontOffice/css/bootstrap.min.css",
+              "src/assets/FrontOffice/css/all-fontawesome.min.css",
+              "src/assets/FrontOffice/css/animate.min.css",
+              "src/assets/FrontOffice/css/magnific-popup.min.css",
+              "src/assets/FrontOffice/css/owl.carousel.min.css",
+              "src/assets/FrontOffice/css/style.css",
+              "src/assets/BackOffice/css/style.css",
+              "src/assets/BackOffice/css/color-1.css",
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "src/assets/FrontOffice/js/jquery-3.7.1.min.js",
+              "src/assets/FrontOffice/js/modernizr.min.js",
+              "src/assets/FrontOffice/js/bootstrap.bundle.min.js",
+              "src/assets/FrontOffice/js/imagesloaded.pkgd.min.js",
+              "src/assets/FrontOffice/js/jquery.magnific-popup.min.js",
+              "src/assets/FrontOffice/js/isotope.pkgd.min.js",
+              "src/assets/FrontOffice/js/jquery.appear.min.js",
+              "src/assets/FrontOffice/js/jquery.easing.min.js",
+              "src/assets/FrontOffice/js/owl.carousel.min.js",
+              "src/assets/FrontOffice/js/counter-up.js",
+              "src/assets/FrontOffice/js/wow.min.js",
+              "src/assets/FrontOffice/js/main.js",
+              "src/assets/BackOffice/js/sidebar.js",
+              "src/assets/BackOffice/js/script.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -94,6 +117,8 @@
               "src/assets/FrontOffice/css/magnific-popup.min.css",
               "src/assets/FrontOffice/css/owl.carousel.min.css",
               "src/assets/FrontOffice/css/style.css",
+              "src/assets/BackOffice/css/style.css",
+              "src/assets/BackOffice/css/color-1.css",
               "src/styles.css"
             ],
             "scripts": [
@@ -108,7 +133,9 @@
               "src/assets/FrontOffice/js/owl.carousel.min.js",
               "src/assets/FrontOffice/js/counter-up.js",
               "src/assets/FrontOffice/js/wow.min.js",
-              "src/assets/FrontOffice/js/main.js"
+              "src/assets/FrontOffice/js/main.js",
+              "src/assets/BackOffice/js/sidebar.js",
+              "src/assets/BackOffice/js/script.js"
             ]
           }
         }

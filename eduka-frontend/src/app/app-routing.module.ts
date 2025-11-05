@@ -11,6 +11,14 @@ import { StudentPageComponent } from './FrontOffice/pages-front/student-page/stu
 import { ClientPageComponent } from './FrontOffice/pages-front/client-page/client-page.component';
 import { AdminPageComponent } from './BackOffice/pages-back/admin-page/admin-page.component';
 import { MenuItemsComponent } from './FrontOffice/menu-items/menu-items.component';
+// New components
+import { RestaurantManagementBackComponent } from './BackOffice/restaurant-management-back/restaurant-management-back.component';
+import { OrderManagementBackComponent } from './BackOffice/order-management-back/order-management-back.component';
+import { UserRestaurantAssignmentComponent } from './BackOffice/user-restaurant-assignment/user-restaurant-assignment.component';
+import { RestaurantListComponent } from './FrontOffice/restaurant-list/restaurant-list.component';
+import { RestaurantDetailsComponent } from './FrontOffice/restaurant-details/restaurant-details.component';
+import { PlaceOrderComponent } from './FrontOffice/place-order/place-order.component';
+import { MyOrdersComponent } from './FrontOffice/my-orders/my-orders.component';
 // Role values match backend Role.java enum: ADMIN, TEACHER, STUDENT, ASSISTANT, CLIENT
 
 export const routes: Routes = [
@@ -42,6 +50,11 @@ export const routes: Routes = [
       },
 
       // Public routes for FrontOffice
+      { path: 'restaurants', component: RestaurantListComponent },
+      { path: 'restaurant/:id', component: RestaurantDetailsComponent },
+      { path: 'place-order', component: PlaceOrderComponent },
+      { path: 'my-orders', component: MyOrdersComponent },
+      { path: 'menu-items', component: MenuItemsComponent },
     ]
   },
   {
@@ -64,6 +77,10 @@ export const routes: Routes = [
     children: [
       { path: '', component: AdminPageComponent },
       { path: 'menu-items', loadComponent: () => import('./BackOffice/menu-items-back/menu-items-back.component').then(m => m.MenuItemsBackComponent) },
+      // Restaurant Management routes
+      { path: 'restaurant-management', component: RestaurantManagementBackComponent },
+      { path: 'order-management', component: OrderManagementBackComponent },
+      { path: 'user-restaurant-assignment', component: UserRestaurantAssignmentComponent },
       // Protected routes for BackOffice
     ]
   },
@@ -73,8 +90,6 @@ export const routes: Routes = [
     pathMatch: 'full'
   },
 
-
-  { path: 'menu-items', component: MenuItemsComponent },
   {
     path: '**',
     redirectTo: ''

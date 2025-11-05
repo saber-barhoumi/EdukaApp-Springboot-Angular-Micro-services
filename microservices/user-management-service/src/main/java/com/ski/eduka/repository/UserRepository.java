@@ -4,6 +4,7 @@ import com.ski.eduka.entity.User;
 import com.ski.eduka.enums.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -58,4 +59,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     @Query("SELECT COUNT(u) FROM User u WHERE u.isActive = true")
     long countActiveUsers();
+    
+    /**
+     * Find users assigned to a specific restaurant
+     */
+    @Query("SELECT u FROM User u WHERE :restaurantId MEMBER OF u.assignedRestaurantIds")
+    List<User> findByAssignedRestaurantId(@Param("restaurantId") Long restaurantId);
 }

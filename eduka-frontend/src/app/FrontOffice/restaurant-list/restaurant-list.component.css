@@ -1,0 +1,265 @@
+/* Restaurant List Styling - Eduka Template Style */
+.event-item {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.event-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.event-location {
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #ff5722 0%, #ff9800 100%);
+  color: #fff;
+}
+
+.event-location span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.event-location i {
+  margin-right: 5px;
+}
+
+.event-img {
+  position: relative;
+  overflow: hidden;
+}
+
+.event-img img {
+  transition: transform 0.5s ease;
+}
+
+.event-item:hover .event-img img {
+  transform: scale(1.1);
+}
+
+.event-info {
+  padding: 25px 20px;
+}
+
+.event-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.event-date,
+.event-time {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.event-date i,
+.event-time i {
+  color: #ff5722;
+  margin-right: 5px;
+}
+
+.event-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  line-height: 1.4;
+}
+
+.event-title a {
+  color: #1a1a1a;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.event-title a:hover {
+  color: #ff5722;
+}
+
+.event-info p {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+.event-btn {
+  margin-top: 20px;
+}
+
+.search-box {
+  margin-bottom: 30px;
+}
+
+.search-box .input-group {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.search-box .form-control {
+  border: none;
+  padding: 15px 25px;
+  font-size: 16px;
+}
+
+.search-box .form-control:focus {
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.search-box .btn {
+  padding: 15px 30px;
+  border: none;
+  background: linear-gradient(135deg, #ff5722 0%, #ff9800 100%);
+}
+
+/* Breadcrumb Styling */
+.breadcrumb-wrapper {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  padding: 80px 0 40px;
+  margin-bottom: 0;
+}
+
+.page-heading {
+  text-align: center;
+}
+
+.page-heading h1 {
+  color: #fff;
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.breadcrumb-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.breadcrumb-items li {
+  color: #fff;
+  font-size: 16px;
+}
+
+.breadcrumb-items li a {
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.breadcrumb-items li a:hover {
+  color: #ff9800;
+}
+
+/* Owl Carousel Custom Navigation */
+.owl-carousel .owl-nav button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #ff5722 !important;
+  color: #fff !important;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 24px;
+  transition: all 0.3s ease;
+}
+
+.owl-carousel .owl-nav button:hover {
+  background: #ff9800 !important;
+}
+
+.owl-carousel .owl-nav button.owl-prev {
+  left: -25px;
+}
+
+.owl-carousel .owl-nav button.owl-next {
+  right: -25px;
+}
+
+.owl-carousel .owl-dots {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.owl-carousel .owl-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background: #ddd;
+  border-radius: 50%;
+  margin: 0 5px;
+  transition: all 0.3s ease;
+}
+
+.owl-carousel .owl-dot.active {
+  background: #ff5722;
+  width: 30px;
+  border-radius: 10px;
+}
+
+/* Site Heading */
+.site-heading {
+  margin-bottom: 50px;
+}
+
+.site-title-tagline {
+  display: inline-block;
+  padding: 8px 20px;
+  background: #fff3e0;
+  color: #ff5722;
+  font-weight: 600;
+  border-radius: 30px;
+  margin-bottom: 15px;
+}
+
+.site-title-tagline i {
+  margin-right: 8px;
+}
+
+.site-title {
+  font-size: 42px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 15px;
+}
+
+.site-title span {
+  color: #ff5722;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .page-heading h1 {
+    font-size: 32px;
+  }
+  
+  .site-title {
+    font-size: 28px;
+  }
+  
+  .event-meta {
+    flex-direction: column;
+  }
+  
+  .owl-carousel .owl-nav button.owl-prev {
+    left: 0;
+  }
+  
+  .owl-carousel .owl-nav button.owl-next {
+    right: 0;
+  }
+}

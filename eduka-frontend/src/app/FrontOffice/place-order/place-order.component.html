@@ -1,0 +1,77 @@
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0"><i class="bi bi-cart-check"></i> Complete Your Order</h3>
+        </div>
+        <div class="card-body">
+          <!-- Order Summary -->
+          <h5>Order Summary</h5>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Price</th>
+                  <th>Qty</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of cart">
+                  <td>{{ item.menuItem.name }}</td>
+                  <td>${{ item.menuItem.price.toFixed(2) }}</td>
+                  <td>{{ item.quantity }}</td>
+                  <td>${{ (item.menuItem.price * item.quantity).toFixed(2) }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="3" class="text-end">Total:</th>
+                  <th>${{ getTotal().toFixed(2) }}</th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <hr />
+
+          <!-- Delivery Form -->
+          <h5>Delivery Information</h5>
+          <form (ngSubmit)="submitOrder()">
+            <div class="mb-3">
+              <label class="form-label">Delivery Address *</label>
+              <textarea
+                class="form-control"
+                rows="3"
+                [(ngModel)]="deliveryAddress"
+                name="deliveryAddress"
+                required
+                placeholder="Enter your delivery address..."
+              ></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Special Instructions</label>
+              <textarea
+                class="form-control"
+                rows="2"
+                [(ngModel)]="notes"
+                name="notes"
+                placeholder="Any special requests? (optional)"
+              ></textarea>
+            </div>
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success btn-lg">
+                <i class="bi bi-check-circle"></i> Place Order
+              </button>
+              <button type="button" class="btn btn-outline-secondary" (click)="cancel()">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

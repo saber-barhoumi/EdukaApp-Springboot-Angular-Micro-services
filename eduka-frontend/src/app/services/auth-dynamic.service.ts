@@ -41,11 +41,13 @@ export class AuthService {
    */
   async registerSimple(user: Partial<User>, password: string): Promise<any> {
     // Ensure required fields for backend: username, email, password, role
-    // Backend expects role: 'user' or 'admin'. Default to 'user'.
-    let role = user.role;
-    if (!role || (role !== 'admin' && role !== 'user')) {
-      role = 'user';
+    // Backend expects role: 'user' or 'admin' (lowercase). Map frontend roles to backend roles.
+    let role = 'user'; // Default to 'user'
+    if (user.role === 'ADMIN') {
+      role = 'admin';
     }
+    // All other roles (CLIENT, ASSISTANT, TEACHER, STUDENT) map to 'user'
+    
     const registrationData = {
       username: user.username || '',
       email: user.email || '',

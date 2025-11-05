@@ -35,12 +35,22 @@ exports.login = async (req, res) => {
 
 exports.register = async (req, res) => {
   try {
+    console.log('Registration request body:', req.body);
     const { username, email, password, role } = req.body;
+    
+    // Validate required fields
+    if (!username || !email || !password) {
+      console.log('Missing required fields:', { username: !!username, email: !!email, password: !!password });
+      return res.status(400).json({ error: 'Username, email, and password are required' });
+    }
+    
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashedPassword, role });
+    const user = new User({ username, email, password: hashedPassword, role: role || 'user' });
     await user.save();
+    console.log('User registered successfully:', username);
     res.status(201).json({ message: 'User registered', user: { ...user.toObject(), password: undefined } });
   } catch (err) {
+    console.error('Registration error:', err.message);
     res.status(400).json({ error: err.message });
   }
 };

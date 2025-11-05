@@ -29,10 +29,11 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:4200")
+                        .allowedOriginPatterns("http://localhost:4200", "*")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
-                        .allowCredentials(true);
+                        .allowCredentials(true)
+                        .maxAge(3600);
             }
         };
     }
@@ -82,7 +83,8 @@ public class SecurityConfig {
                 // Updated CSRF configuration
                 .csrf(csrf -> csrf.disable())
 
-                // CORS handled by API Gateway
+                // Enable CORS
+                .cors(cors -> cors.configure(http))
 
                 // Configure headers to allow H2 console in frames
                 .headers(headers -> headers
