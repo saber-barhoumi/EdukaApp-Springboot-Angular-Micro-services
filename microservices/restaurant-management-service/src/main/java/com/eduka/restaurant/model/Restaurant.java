@@ -1,5 +1,6 @@
 package com.eduka.restaurant.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -53,17 +54,20 @@ public class Restaurant {
     private LocalDateTime updatedAt = LocalDateTime.now();
     
     // One-to-Many: Restaurant -> MenuItem
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<MenuItem> menuItems = new ArrayList<>();
     
     // One-to-Many: Restaurant -> Order
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Order> orders = new ArrayList<>();
     
     // Many-to-Many: Restaurant <-> User (assigned users)
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "restaurant_users", joinColumns = @JoinColumn(name = "restaurant_id"))
     @Column(name = "user_id")
+    @JsonIgnore
     private Set<Long> assignedUserIds = new HashSet<>();
     
     @PreUpdate

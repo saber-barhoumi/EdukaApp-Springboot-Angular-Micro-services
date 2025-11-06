@@ -52,6 +52,10 @@ public class RestaurantController {
     @GetMapping
     public ResponseEntity<List<Restaurant>> getAllRestaurants() {
         List<Restaurant> restaurants = restaurantService.getAllRestaurants();
+        System.out.println("DEBUG: Found " + restaurants.size() + " restaurants");
+        for (Restaurant r : restaurants) {
+            System.out.println("DEBUG: Restaurant ID=" + r.getId() + ", Name=" + r.getName());
+        }
         return ResponseEntity.ok(restaurants);
     }
     
