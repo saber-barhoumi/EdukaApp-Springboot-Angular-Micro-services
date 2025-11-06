@@ -21,11 +21,8 @@ WORKDIR /app
 # Copy jar from build stage
 COPY --from=build /app/target/*.jar app.jar
 
-# Create data directory for H2 database
-RUN mkdir -p /app/data
-
-# Expose port
-EXPOSE 8083
+# Expose API Gateway port
+EXPOSE 8888
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]

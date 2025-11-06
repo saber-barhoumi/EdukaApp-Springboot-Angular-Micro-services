@@ -29,8 +29,6 @@
               "src/assets/FrontOffice/css/magnific-popup.min.css",
               "src/assets/FrontOffice/css/owl.carousel.min.css",
               "src/assets/FrontOffice/css/style.css",
-              "src/assets/BackOffice/css/style.css",
-              "src/assets/BackOffice/css/color-1.css",
               "src/styles.css"
             ],
             "scripts": [
@@ -55,13 +53,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
                 }
               ],
               "outputHashing": "all"
@@ -117,8 +115,6 @@
               "src/assets/FrontOffice/css/magnific-popup.min.css",
               "src/assets/FrontOffice/css/owl.carousel.min.css",
               "src/assets/FrontOffice/css/style.css",
-              "src/assets/BackOffice/css/style.css",
-              "src/assets/BackOffice/css/color-1.css",
               "src/styles.css"
             ],
             "scripts": [

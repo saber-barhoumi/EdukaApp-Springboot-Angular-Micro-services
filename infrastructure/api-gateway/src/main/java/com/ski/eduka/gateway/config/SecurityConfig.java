@@ -26,8 +26,9 @@ public class SecurityConfig {
                         // Allow access to Eureka server without authentication
                         .pathMatchers("/eureka/**").permitAll()
                         
-                        // All other requests require authentication
-                        .anyExchange().authenticated()
+                        // TEMPORARY: Allow all requests for frontend testing
+                        // TODO: Re-enable authentication after implementing Keycloak in Angular
+                        .anyExchange().permitAll()
                 )
                 
                 // Configure OAuth2 Resource Server with JWT

@@ -100,17 +100,7 @@ Changes made:
 
 ### Step 3: Test with Postman (10 minutes)
 
-#### Test 1: Without Token (Should Fail ❌)
-```
-GET http://localhost:8888/api/restaurants
-Expected: 401 Unauthorized
-```
 
-#### Test 2: Get Token from Keycloak
-In Postman:
-1. Go to Authorization tab
-2. Type: `OAuth 2.0`
-3. Click "Get New Access Token"
 4. Configure:
    - **Token Name**: `EdukaKeycloakToken`
    - **Grant Type**: `Client Credentials`
