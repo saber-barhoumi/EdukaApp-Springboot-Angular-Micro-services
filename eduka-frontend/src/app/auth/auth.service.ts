@@ -38,7 +38,8 @@ export class AuthService {
 
   async loginWithCredentials(username: string, password: string): Promise<void> {
     try {
-      const keycloakUrl = `${keycloakConfig.url}/realms/${keycloakConfig.realm}/protocol/openid-connect/token`;
+const config = keycloakConfig as any;
+const keycloakUrl = `${config.url}/realms/${config.realm}/protocol/openid-connect/token`;
       
       const body = new URLSearchParams();
       body.set('grant_type', 'password');
