@@ -86,6 +86,11 @@
 			<optional>true</optional>
 		</dependency>
 
+		<!-- OpenFeign for Microservice Communication -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
 
 		<!-- Test Dependencies -->
 		<dependency>

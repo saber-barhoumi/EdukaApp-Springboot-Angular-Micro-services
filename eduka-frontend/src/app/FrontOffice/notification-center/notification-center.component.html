@@ -1,0 +1,85 @@
+<div class="notification-wrapper">
+  <!-- Bell Icon Button -->
+  <button class="notification-bell" (click)="toggleDropdown()" type="button">
+    <i class="fas fa-bell"></i>
+    <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+  </button>
+
+  <!-- Notification Dropdown Panel -->
+  <div class="notification-dropdown" *ngIf="showDropdown">
+    <!-- Header -->
+    <div class="notification-header">
+      <h3>Notifications</h3>
+      <div class="header-actions">
+        <button class="mark-all-read" (click)="markAllAsRead()" *ngIf="unreadCount > 0" type="button">
+          Mark all as read
+        </button>
+        <button class="clear-all" (click)="clearAll()" *ngIf="notifications.length > 0" type="button">
+          Clear all
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="notification-filters">
+      <button 
+        [class.active]="filterType === 'all'" 
+        (click)="filterType = 'all'; filterNotifications()"
+        type="button">
+        All ({{ notifications.length }})
+      </button>
+      <button 
+        [class.active]="filterType === 'unread'" 
+        (click)="filterType = 'unread'; filterNotifications()"
+        type="button">
+        Unread ({{ unreadCount }})
+      </button>
+      <button 
+        [class.active]="filterType === 'success'" 
+        (click)="filterType = 'success'; filterNotifications()"
+        type="button">
+        Success
+      </button>
+      <button 
+        [class.active]="filterType === 'error'" 
+        (click)="filterType = 'error'; filterNotifications()"
+        type="button">
+        Error
+      </button>
+    </div>
+
+    <!-- Notification List -->
+    <div class="notification-list">
+      <div 
+        *ngFor="let notification of filteredNotifications" 
+        class="notification-item" 
+        [class.unread]="!notification.read"
+        (click)="markAsRead(notification)">
+        
+        <div class="notification-icon" [class]="'icon-' + notification.type">
+          {{ getNotificationIcon(notification.type) }}
+        </div>
+        
+        <div class="notification-content">
+          <h4>{{ notification.title }}</h4>
+          <p>{{ notification.message }}</p>
+          <span class="notification-time">{{ getNotificationTime(notification.timestamp) }}</span>
+        </div>
+        
+        <button 
+          class="delete-btn" 
+          (click)="deleteNotification(notification.id, $event)"
+          type="button"
+          title="Delete">
+          ×
+        </button>
+      </div>
+
+      <!-- Empty State -->
+      <div class="notification-empty" *ngIf="filteredNotifications.length === 0">
+        <i class="far fa-bell-slash"></i>
+        <p>No notifications</p>
+      </div>
+    </div>
+  </div>
+</div>

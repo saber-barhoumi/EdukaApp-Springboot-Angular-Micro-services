@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { RestaurantService, Restaurant } from '../../services/restaurant.service';
 import { MenuItemService, MenuItem } from '../../services/menu-item.service';
 
@@ -12,7 +12,7 @@ interface CartItem {
 @Component({
   selector: 'app-restaurant-details',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './restaurant-details.component.html',
   styleUrls: ['./restaurant-details.component.css']
 })

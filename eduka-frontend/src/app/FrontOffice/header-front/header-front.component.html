@@ -247,6 +247,11 @@
                                         class="far fa-search"></i></button>
                             </div>
                             
+                            <!-- 🔔 NOTIFICATION CENTER (Only visible when logged in) -->
+                            <div *ngIf="isLoggedIn" style="display: inline-block; margin-right: 10px;">
+                                <app-notification-center></app-notification-center>
+                            </div>
+                            
                             <!-- Authentication Section -->
                             <div class="nav-right-btn mt-2" *ngIf="!isLoggedIn">
                                 <button (click)="navigateToLogin()" class="theme-btn">

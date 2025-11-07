@@ -1,154 +1,226 @@
-<div class="container mt-4" *ngIf="restaurant">
-  <!-- Restaurant Header -->
-  <div class="restaurant-header mb-4">
-    <button class="btn btn-outline-secondary mb-3" (click)="goBack()">
-      <i class="bi bi-arrow-left"></i> Back to Restaurants
-    </button>
-    
-    <div class="row">
-      <div class="col-md-4">
-        <img
-          [src]="restaurant.imageUrl || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect width=%22400%22 height=%22300%22 fill=%22%23667eea%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%23ffffff%22%3ERestaurant%3C/text%3E%3C/svg%3E'"
-          [alt]="restaurant.name"
-          class="img-fluid rounded shadow"
-          (error)="$any($event.target).src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect width=%22400%22 height=%22300%22 fill=%22%23667eea%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%23ffffff%22%3ERestaurant%3C/text%3E%3C/svg%3E'"
-        />
-      </div>
-      <div class="col-md-8">
-        <h1 class="display-5">{{ restaurant.name }}</h1>
-        <p class="lead text-muted">{{ restaurant.description }}</p>
-        <div class="restaurant-info">
-          <p><i class="bi bi-geo-alt text-primary"></i> {{ restaurant.address }}</p>
-          <p><i class="bi bi-clock text-success"></i> {{ restaurant.openingHours }}</p>
-          <p><i class="bi bi-telephone text-info"></i> {{ restaurant.phoneNumber }}</p>
-          <p><i class="bi bi-envelope text-warning"></i> {{ restaurant.email }}</p>
-        </div>
-        <span class="badge bg-info me-2">{{ restaurant.type }}</span>
-        <span class="badge bg-success" *ngIf="restaurant.isActive">
-          <i class="bi bi-check-circle"></i> Open Now
-        </span>
+<!-- Breadcrumb -->
+<div class="breadcrumb-wrapper" *ngIf="restaurant">
+  <div class="container">
+    <div class="page-heading">
+      <h1>{{ restaurant.name }}</h1>
+      <div class="page-header">
+        <ul class="breadcrumb-items">
+          <li><a routerLink="/">Home</a></li>
+          <li><i class="far fa-chevron-right"></i></li>
+          <li><a routerLink="/restaurants">Restaurants</a></li>
+          <li><i class="far fa-chevron-right"></i></li>
+          <li>{{ restaurant.name }}</li>
+        </ul>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Category Filter -->
-  <div class="mb-4">
-    <h4>Menu Categories</h4>
-    <div class="btn-group" role="group">
-      <button
-        class="btn"
-        [ngClass]="!selectedCategory ? 'btn-primary' : 'btn-outline-primary'"
-        (click)="filterByCategory('')"
-      >
-        All Items
-      </button>
-      <button
-        *ngFor="let category of categories"
-        class="btn"
-        [ngClass]="selectedCategory === category ? 'btn-primary' : 'btn-outline-primary'"
-        (click)="filterByCategory(category)"
-      >
-        {{ category }}
-      </button>
-    </div>
-  </div>
-
-  <!-- Menu Items Grid -->
-  <div class="row">
-    <div class="col-md-8">
-      <h3 class="mb-4">Menu</h3>
+<!-- Restaurant Details -->
+<div class="restaurant-single py-120" *ngIf="restaurant">
+  <div class="container">
+    <!-- Restaurant Header -->
+    <div class="restaurant-detail-wrapper">
       <div class="row">
-        <div class="col-md-6 mb-4" *ngFor="let item of filteredMenuItems">
-          <div class="card menu-item-card h-100">
-            <div class="card-body">
-              <h5 class="card-title">{{ item.name }}</h5>
-              <p class="card-text text-muted">{{ item.description }}</p>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="price">${{ item.price.toFixed(2) }}</span>
-                <span class="badge bg-secondary">{{ item.category }}</span>
-              </div>
-              <div class="mt-3 d-flex justify-content-between align-items-center">
-                <small class="text-muted">
-                  <i class="bi bi-clock"></i> {{ item.preparationTime || 15 }} min
-                </small>
-                <div class="btn-group" role="group">
-                  <button
-                    *ngIf="getCartItemQuantity(item.id!) > 0"
-                    class="btn btn-sm btn-outline-danger"
-                    (click)="removeFromCart(item)"
-                  >
-                    <i class="bi bi-dash"></i>
-                  </button>
-                  <span
-                    *ngIf="getCartItemQuantity(item.id!) > 0"
-                    class="btn btn-sm btn-light disabled"
-                  >
-                    {{ getCartItemQuantity(item.id!) }}
-                  </span>
-                  <button
-                    class="btn btn-sm btn-success"
-                    (click)="addToCart(item)"
-                  >
-                    <i class="bi bi-plus"></i>
-                  </button>
+        <div class="col-lg-5">
+          <div class="restaurant-img">
+            <img
+              [src]="restaurant.imageUrl || 'assets/FrontOffice/img/restaurant-placeholder.jpg'"
+              [alt]="restaurant.name"
+              class="img-fluid rounded-3"
+              (error)="$any($event.target).src='https://via.placeholder.com/600x400/667eea/ffffff?text=Restaurant'"
+            />
+            <div class="restaurant-badge" *ngIf="restaurant.isActive">
+              <span class="badge-status open"><i class="far fa-check-circle"></i> Open Now</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-7">
+          <div class="restaurant-content">
+            <div class="restaurant-meta mb-3">
+              <span class="restaurant-type"><i class="far fa-utensils"></i> {{ restaurant.type }}</span>
+            </div>
+            <h2 class="restaurant-title">{{ restaurant.name }}</h2>
+            <p class="restaurant-description">{{ restaurant.description }}</p>
+            
+            <div class="restaurant-info-list mt-4">
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="far fa-map-marker-alt"></i>
+                </div>
+                <div class="info-content">
+                  <h6>Address</h6>
+                  <p>{{ restaurant.address }}</p>
                 </div>
               </div>
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="far fa-clock"></i>
+                </div>
+                <div class="info-content">
+                  <h6>Opening Hours</h6>
+                  <p>{{ restaurant.openingHours }}</p>
+                </div>
+              </div>
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="far fa-phone"></i>
+                </div>
+                <div class="info-content">
+                  <h6>Phone</h6>
+                  <p>{{ restaurant.phoneNumber }}</p>
+                </div>
+              </div>
+              <div class="info-item">
+                <div class="info-icon">
+                  <i class="far fa-envelope"></i>
+                </div>
+                <div class="info-content">
+                  <h6>Email</h6>
+                  <p>{{ restaurant.email }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="restaurant-action mt-4">
+              <button class="theme-btn" (click)="goBack()">
+                <i class="far fa-arrow-left"></i> Back to Restaurants
+              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Shopping Cart Sidebar -->
-    <div class="col-md-4">
-      <div class="cart-sidebar sticky-top">
-        <div class="card">
-          <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">
-              <i class="bi bi-cart"></i> Your Order ({{ getCartItemCount() }} items)
-            </h5>
-          </div>
-          <div class="card-body">
-            <div *ngIf="cart.length === 0" class="text-center text-muted py-4">
-              <i class="bi bi-cart-x" style="font-size: 3rem;"></i>
-              <p class="mt-2">Your cart is empty</p>
+    <!-- Menu Section -->
+    <div class="menu-section mt-60">
+      <div class="row">
+        <!-- Menu Items -->
+        <div class="col-lg-8">
+          <div class="menu-wrapper">
+            <!-- Category Filter -->
+            <div class="filter-bar mb-40">
+              <h3 class="mb-3">Our Menu</h3>
+              <div class="category-filter">
+                <button
+                  class="filter-btn"
+                  [class.active]="!selectedCategory"
+                  (click)="filterByCategory('')"
+                >
+                  <i class="far fa-list"></i> All Items
+                </button>
+                <button
+                  *ngFor="let category of categories"
+                  class="filter-btn"
+                  [class.active]="selectedCategory === category"
+                  (click)="filterByCategory(category)"
+                >
+                  <i class="far fa-tag"></i> {{ category }}
+                </button>
+              </div>
             </div>
-            
-            <div *ngFor="let item of cart" class="cart-item mb-3">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <strong>{{ item.menuItem.name }}</strong>
-                  <br />
-                  <small class="text-muted">
-                    ${{ item.menuItem.price.toFixed(2) }} x {{ item.quantity }}
-                  </small>
-                </div>
-                <div class="text-end">
-                  <strong>${{ (item.menuItem.price * item.quantity).toFixed(2) }}</strong>
-                  <br />
-                  <button
-                    class="btn btn-sm btn-link text-danger"
-                    (click)="removeFromCart(item.menuItem)"
-                  >
-                    <i class="bi bi-trash"></i>
-                  </button>
+
+            <!-- Menu Grid -->
+            <div class="row">
+              <div class="col-md-6 mb-4" *ngFor="let item of filteredMenuItems">
+                <div class="menu-item-card">
+                  <div class="menu-item-content">
+                    <div class="menu-item-header">
+                      <h4 class="menu-item-title">{{ item.name }}</h4>
+                      <span class="menu-item-price">${{ item.price.toFixed(2) }}</span>
+                    </div>
+                    <p class="menu-item-description">{{ item.description }}</p>
+                    <div class="menu-item-meta">
+                      <span class="category-badge">
+                        <i class="far fa-bookmark"></i> {{ item.category }}
+                      </span>
+                      <span class="prep-time">
+                        <i class="far fa-clock"></i> {{ item.preparationTime || 15 }} min
+                      </span>
+                    </div>
+                    <div class="menu-item-action">
+                      <div class="quantity-controls" *ngIf="getCartItemQuantity(item.id!) > 0">
+                        <button class="qty-btn minus" (click)="removeFromCart(item)">
+                          <i class="far fa-minus"></i>
+                        </button>
+                        <span class="qty-display">{{ getCartItemQuantity(item.id!) }}</span>
+                        <button class="qty-btn plus" (click)="addToCart(item)">
+                          <i class="far fa-plus"></i>
+                        </button>
+                      </div>
+                      <button
+                        class="add-to-cart-btn"
+                        *ngIf="getCartItemQuantity(item.id!) === 0"
+                        (click)="addToCart(item)"
+                      >
+                        <i class="far fa-shopping-cart"></i> Add to Cart
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <hr *ngIf="cart.length > 0" />
-            
-            <div *ngIf="cart.length > 0" class="total-section">
-              <div class="d-flex justify-content-between mb-3">
-                <h5>Total:</h5>
-                <h5 class="text-primary">${{ getCartTotal().toFixed(2) }}</h5>
+            <!-- Empty State -->
+            <div class="text-center py-5" *ngIf="filteredMenuItems.length === 0">
+              <i class="far fa-utensils" style="font-size: 4rem; color: #ddd;"></i>
+              <h4 class="mt-3">No menu items found</h4>
+              <p class="text-muted">Try selecting a different category</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cart Sidebar -->
+        <div class="col-lg-4">
+          <div class="cart-sidebar-wrapper sticky-sidebar">
+            <div class="cart-card">
+              <div class="cart-header">
+                <h4><i class="far fa-shopping-cart"></i> Your Order</h4>
+                <span class="cart-count">{{ getCartItemCount() }} items</span>
               </div>
-              <button
-                class="btn btn-success w-100"
-                (click)="proceedToCheckout()"
-              >
-                <i class="bi bi-check-circle"></i> Proceed to Checkout
-              </button>
+              
+              <div class="cart-body">
+                <!-- Empty Cart -->
+                <div class="empty-cart" *ngIf="cart.length === 0">
+                  <i class="far fa-shopping-basket"></i>
+                  <p>Your cart is empty</p>
+                  <small>Add items from the menu to get started</small>
+                </div>
+
+                <!-- Cart Items -->
+                <div class="cart-items" *ngIf="cart.length > 0">
+                  <div class="cart-item" *ngFor="let item of cart">
+                    <div class="cart-item-info">
+                      <h6>{{ item.menuItem.name }}</h6>
+                      <p class="cart-item-price">
+                        ${{ item.menuItem.price.toFixed(2) }} × {{ item.quantity }}
+                      </p>
+                    </div>
+                    <div class="cart-item-actions">
+                      <div class="cart-item-total">
+                        ${{ (item.menuItem.price * item.quantity).toFixed(2) }}
+                      </div>
+                      <button class="remove-btn" (click)="removeFromCart(item.menuItem)">
+                        <i class="far fa-trash-alt"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Cart Footer -->
+              <div class="cart-footer" *ngIf="cart.length > 0">
+                <div class="cart-total">
+                  <span>Total Amount:</span>
+                  <span class="total-price">${{ getCartTotal().toFixed(2) }}</span>
+                </div>
+                <button class="checkout-btn" (click)="proceedToCheckout()">
+                  <i class="far fa-check-circle"></i> Proceed to Checkout
+                </button>
+                <p class="cart-note">
+                  <i class="far fa-info-circle"></i> Delivery charges may apply
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -156,3 +228,499 @@
     </div>
   </div>
 </div>
+
+<!-- Loading State -->
+<div class="loading-state py-120" *ngIf="!restaurant">
+  <div class="container text-center">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-3">Loading restaurant details...</p>
+  </div>
+</div>
+
+<style>
+  /* Breadcrumb */
+  .breadcrumb-wrapper {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 60px 0;
+    color: white;
+  }
+
+  .breadcrumb-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .breadcrumb-items li {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .breadcrumb-items a {
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+
+  .breadcrumb-items a:hover {
+    color: #ffd700;
+  }
+
+  /* Restaurant Detail */
+  .restaurant-detail-wrapper {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    margin-top: -40px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .restaurant-img {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+  }
+
+  .restaurant-img img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+  }
+
+  .restaurant-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+  }
+
+  .badge-status {
+    background: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    display: inline-block;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+  }
+
+  .restaurant-meta {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .restaurant-type {
+    background: #f8f9fa;
+    padding: 8px 20px;
+    border-radius: 25px;
+    color: #667eea;
+    font-weight: 600;
+  }
+
+  .restaurant-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 15px 0;
+  }
+
+  .restaurant-description {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    line-height: 1.8;
+  }
+
+  .restaurant-info-list {
+    display: grid;
+    gap: 20px;
+  }
+
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    transition: all 0.3s;
+  }
+
+  .info-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+  }
+
+  .info-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.3rem;
+  }
+
+  .info-content h6 {
+    margin: 0 0 5px 0;
+    color: #667eea;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .info-content p {
+    margin: 0;
+    color: #2c3e50;
+    font-weight: 500;
+  }
+
+  /* Menu Section */
+  .menu-section {
+    margin-top: 60px;
+  }
+
+  .filter-bar h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+  }
+
+  .category-filter {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    padding: 12px 25px;
+    border: 2px solid #e9ecef;
+    background: white;
+    border-radius: 30px;
+    color: #7f8c8d;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .filter-btn:hover,
+  .filter-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+  }
+
+  /* Menu Item Card */
+  .menu-item-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s;
+    height: 100%;
+  }
+
+  .menu-item-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  .menu-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 15px;
+  }
+
+  .menu-item-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+    flex: 1;
+  }
+
+  .menu-item-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #28a745;
+    white-space: nowrap;
+    margin-left: 15px;
+  }
+
+  .menu-item-description {
+    color: #7f8c8d;
+    margin-bottom: 15px;
+    line-height: 1.6;
+  }
+
+  .menu-item-meta {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .category-badge,
+  .prep-time {
+    padding: 6px 15px;
+    background: #f8f9fa;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #667eea;
+    font-weight: 600;
+  }
+
+  .menu-item-action {
+    margin-top: auto;
+  }
+
+  .quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: center;
+  }
+
+  .qty-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #667eea;
+    background: white;
+    border-radius: 50%;
+    color: #667eea;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .qty-btn:hover {
+    background: #667eea;
+    color: white;
+  }
+
+  .qty-display {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2c3e50;
+    min-width: 30px;
+    text-align: center;
+  }
+
+  .add-to-cart-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .add-to-cart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+  }
+
+  /* Cart Sidebar */
+  .sticky-sidebar {
+    position: sticky;
+    top: 20px;
+  }
+
+  .cart-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .cart-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .cart-header h4 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .cart-count {
+    background: rgba(255, 255, 255, 0.3);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+
+  .cart-body {
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .empty-cart {
+    text-align: center;
+    padding: 40px 20px;
+    color: #bdc3c7;
+  }
+
+  .empty-cart i {
+    font-size: 4rem;
+    margin-bottom: 15px;
+  }
+
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .cart-item:last-child {
+    border-bottom: none;
+  }
+
+  .cart-item-info h6 {
+    margin: 0 0 5px 0;
+    color: #2c3e50;
+    font-weight: 600;
+  }
+
+  .cart-item-price {
+    margin: 0;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+  }
+
+  .cart-item-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
+
+  .cart-item-total {
+    font-weight: 700;
+    color: #28a745;
+    font-size: 1.1rem;
+  }
+
+  .remove-btn {
+    background: #ff4757;
+    color: white;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .remove-btn:hover {
+    background: #ff3838;
+    transform: scale(1.1);
+  }
+
+  .cart-footer {
+    padding: 20px;
+    border-top: 2px solid #e9ecef;
+  }
+
+  .cart-total {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+  }
+
+  .total-price {
+    color: #28a745;
+    font-size: 1.5rem;
+  }
+
+  .checkout-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .checkout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+  }
+
+  .cart-note {
+    margin: 15px 0 0 0;
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 0.85rem;
+  }
+
+  .theme-btn {
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .theme-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+  }
+
+  .py-120 {
+    padding: 120px 0;
+  }
+
+  .mt-60 {
+    margin-top: 60px;
+  }
+
+  .mb-40 {
+    margin-bottom: 40px;
+  }
+
+  @media (max-width: 991px) {
+    .sticky-sidebar {
+      position: relative;
+      margin-top: 40px;
+    }
+
+    .restaurant-detail-wrapper {
+      padding: 30px 20px;
+    }
+
+    .restaurant-title {
+      font-size: 2rem;
+    }
+  }
+</style>

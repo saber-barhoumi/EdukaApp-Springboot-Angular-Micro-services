@@ -1,0 +1,119 @@
+<!-- Notification Bell Icon -->
+<div class="notification-bell" (click)="togglePanel()">
+  <i class="fas fa-bell"></i>
+  <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+</div>
+
+<!-- Notification Panel -->
+<div class="notification-panel" [class.open]="isOpen">
+  <!-- Header -->
+  <div class="notification-header">
+    <h5>
+      <i class="fas fa-bell me-2"></i>
+      Notifications
+      <span class="badge bg-primary ms-2" *ngIf="unreadCount > 0">{{ unreadCount }} new</span>
+    </h5>
+    <button class="btn-close" (click)="closePanel()" aria-label="Close"></button>
+  </div>
+
+  <!-- Actions -->
+  <div class="notification-actions" *ngIf="notifications.length > 0">
+    <button class="btn btn-sm btn-outline-primary" (click)="markAllAsRead()" *ngIf="unreadCount > 0">
+      <i class="fas fa-check-double me-1"></i>
+      Mark all as read
+    </button>
+    <button class="btn btn-sm btn-outline-danger" (click)="clearAll()">
+      <i class="fas fa-trash me-1"></i>
+      Clear all
+    </button>
+  </div>
+
+  <!-- Notifications List -->
+  <div class="notifications-list">
+    <div *ngIf="notifications.length === 0" class="empty-state">
+      <i class="fas fa-bell-slash"></i>
+      <p>No notifications yet</p>
+      <small>You'll see updates about your orders here</small>
+    </div>
+
+    <div 
+      *ngFor="let notification of notifications" 
+      class="notification-item"
+      [class.unread]="!notification.read"
+      (click)="onNotificationClick(notification)"
+    >
+      <!-- Notification Icon -->
+      <div class="notification-icon" [ngClass]="'type-' + notification.type.toLowerCase()">
+        <span class="icon-emoji">{{ getNotificationIcon(notification.type) }}</span>
+      </div>
+
+      <!-- Notification Content -->
+      <div class="notification-content">
+        <div class="notification-header-row">
+          <span class="notification-type">
+            {{ notificationService.getTypeLabel(notification.type) }}
+          </span>
+          <span class="notification-time">{{ getTimeAgo(notification.timestamp) }}</span>
+        </div>
+        
+        <h6 class="notification-subject">{{ notification.subject }}</h6>
+        <p class="notification-message">{{ notification.message }}</p>
+
+        <!-- Order Details -->
+        <div *ngIf="notification.details && notification.type === 'ORDER'" class="notification-details">
+          <div class="detail-row">
+            <i class="fas fa-hashtag"></i>
+            <span>Order ID: {{ notification.details.orderId }}</span>
+          </div>
+          <div class="detail-row" *ngIf="notification.details.restaurantName">
+            <i class="fas fa-store"></i>
+            <span>{{ notification.details.restaurantName }}</span>
+          </div>
+          <div class="detail-row" *ngIf="notification.details.totalAmount">
+            <i class="fas fa-dollar-sign"></i>
+            <span>Total: ${{ notification.details.totalAmount.toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <!-- Library Details -->
+        <div *ngIf="notification.details && notification.type === 'LIBRARY'" class="notification-details">
+          <div class="detail-row" *ngIf="notification.details.bookTitle">
+            <i class="fas fa-book"></i>
+            <span>{{ notification.details.bookTitle }}</span>
+          </div>
+          <div class="detail-row" *ngIf="notification.details.additionalInfo">
+            <i class="fas fa-info-circle"></i>
+            <span>{{ notification.details.additionalInfo }}</span>
+          </div>
+        </div>
+
+        <!-- Housing Details -->
+        <div *ngIf="notification.details && notification.type === 'HOUSING'" class="notification-details">
+          <div class="detail-row" *ngIf="notification.details.roomNumber">
+            <i class="fas fa-door-open"></i>
+            <span>Room {{ notification.details.roomNumber }}</span>
+          </div>
+          <div class="detail-row" *ngIf="notification.details.additionalInfo">
+            <i class="fas fa-info-circle"></i>
+            <span>{{ notification.details.additionalInfo }}</span>
+          </div>
+        </div>
+
+        <!-- Unread Indicator -->
+        <span class="unread-dot" *ngIf="!notification.read"></span>
+      </div>
+
+      <!-- Delete Button -->
+      <button 
+        class="btn-delete" 
+        (click)="deleteNotification($event, notification.id)"
+        title="Delete notification"
+      >
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay -->
+<div class="notification-overlay" [class.show]="isOpen" (click)="closePanel()"></div>

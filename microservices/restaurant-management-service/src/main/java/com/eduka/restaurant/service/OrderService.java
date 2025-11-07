@@ -1,5 +1,7 @@
 package com.eduka.restaurant.service;
 
+import com.eduka.restaurant.client.NotificationMessageDTO;
+import com.eduka.restaurant.client.NotificationServiceClient;
 import com.eduka.restaurant.client.UserClient;
 import com.eduka.restaurant.dto.UserDTO;
 import com.eduka.restaurant.model.MenuItem;
@@ -9,6 +11,7 @@ import com.eduka.restaurant.model.Restaurant;
 import com.eduka.restaurant.repository.MenuItemRepository;
 import com.eduka.restaurant.repository.OrderRepository;
 import com.eduka.restaurant.repository.RestaurantRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +22,7 @@ import java.util.List;
 
 @Service
 @Transactional
+@Slf4j
 public class OrderService {
     
     @Autowired
@@ -32,6 +36,9 @@ public class OrderService {
     
     @Autowired
     private UserClient userClient;
+    
+    @Autowired
+    private NotificationServiceClient notificationServiceClient;
     
     /**
      * Validate that a user exists before creating an order
@@ -53,9 +60,13 @@ public class OrderService {
     
     public Order createOrder(Order order, Long restaurantId, List<Long> menuItemIds) {
         // Validate user exists before creating order
+        // TODO: Re-enable user validation when Node.js User Service is containerized
+        // TEMPORARILY DISABLED for Docker workshop - Node.js service not in docker-compose
+        /*
         if (order.getUserId() != null) {
             validateUser(order.getUserId());
         }
+        */
         
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
             .orElseThrow(() -> new RuntimeException("Restaurant not found with id: " + restaurantId));
@@ -72,7 +83,42 @@ public class OrderService {
         order.calculateTotal();
         order.setStatus(OrderStatus.PENDING);
         
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        
+        // 🔥 FEIGN CLIENT COMMUNICATION #1: Restaurant → Notification Service
+        // Send order confirmation notification via RabbitMQ
+        sendOrderNotification(savedOrder);
+        
+        return savedOrder;
+    }
+    
+    /**
+     * Send order notification using Feign Client to Notification Service
+     * This demonstrates inter-service communication pattern
+     */
+    private void sendOrderNotification(Order order) {
+        try {
+            NotificationMessageDTO notification = new NotificationMessageDTO();
+            notification.setUserId(order.getUserId());
+            notification.setType("ORDER");
+            notification.setSubject("Order Confirmation");
+            notification.setMessage("Your order has been placed successfully!");
+            notification.setTimestamp(LocalDateTime.now());
+            
+            NotificationMessageDTO.NotificationDetails details = new NotificationMessageDTO.NotificationDetails();
+            details.setOrderId(order.getId().toString());
+            details.setRestaurantName(order.getRestaurant().getName());
+            details.setTotalAmount(order.getTotalAmount());
+            notification.setDetails(details);
+            
+            // Call Notification Service via Feign Client
+            notificationServiceClient.sendNotification(notification);
+            log.info("✅ Order notification sent via Feign Client for order: {}", order.getId());
+            
+        } catch (Exception e) {
+            log.error("❌ Failed to send order notification: {}", e.getMessage());
+            // Don't fail the order creation if notification fails
+        }
     }
     
     public Order updateOrder(Long id, Order orderDetails) {

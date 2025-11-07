@@ -1,8 +1,10 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { RestaurantService, Restaurant } from '../../services/restaurant.service';
+import { OrderService, Order, OrderStatus } from '../../services/order.service';
+import { AuthService } from '../../services/auth-dynamic.service';
 
 declare var $: any;
 
@@ -16,18 +18,34 @@ declare var $: any;
 export class RestaurantListComponent implements OnInit, AfterViewInit {
   restaurants: Restaurant[] = [];
   filteredRestaurants: Restaurant[] = [];
+  userOrders: Order[] = [];
+  filteredOrders: Order[] = [];
   searchTerm = '';
   filterType = '';
+  orderStatusFilter = '';
+  currentUserId: string | null = null;
+  activeTab: 'restaurants' | 'orders' = 'restaurants';
   
   restaurantTypes = ['Cafeteria', 'Fast Food', 'Fine Dining', 'Food Court', 'Other'];
+  orderStatuses = Object.values(OrderStatus);
 
   constructor(
     private restaurantService: RestaurantService,
+    private orderService: OrderService,
+    private authService: AuthService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
+    // Get current user ID
+    const user = this.authService.getCurrentUser();
+    if (user && user._id) {
+      this.currentUserId = user._id;
+      console.log('✅ Current User ID:', this.currentUserId);
+    }
+
     this.loadRestaurants();
+    this.loadUserOrders();
   }
 
   ngAfterViewInit(): void {
@@ -43,12 +61,31 @@ export class RestaurantListComponent implements OnInit, AfterViewInit {
         // Only show active restaurants to front-office users
         this.restaurants = data.filter(r => r.isActive);
         this.filteredRestaurants = this.restaurants;
+        console.log('📍 Loaded restaurants:', this.restaurants.length);
         // Reinitialize carousel after data loads
         setTimeout(() => {
           this.initializeOwlCarousel();
         }, 100);
       },
       error: (error) => console.error('Error loading restaurants:', error)
+    });
+  }
+
+  loadUserOrders(): void {
+    if (!this.currentUserId) {
+      console.log('⚠️ No user logged in');
+      return;
+    }
+
+    this.orderService.getOrdersByUser(this.currentUserId as any).subscribe({
+      next: (data) => {
+        this.userOrders = data.sort((a, b) => {
+          return new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime();
+        });
+        this.filteredOrders = this.userOrders;
+        console.log('📦 Loaded user orders:', this.userOrders.length);
+      },
+      error: (error) => console.error('Error loading orders:', error)
     });
   }
 
@@ -66,12 +103,60 @@ export class RestaurantListComponent implements OnInit, AfterViewInit {
     }, 100);
   }
 
+  filterOrders(): void {
+    this.filteredOrders = this.userOrders.filter(order => {
+      const matchesStatus = !this.orderStatusFilter || order.status === this.orderStatusFilter;
+      return matchesStatus;
+    });
+  }
+
+  switchTab(tab: 'restaurants' | 'orders'): void {
+    this.activeTab = tab;
+    if (tab === 'restaurants') {
+      setTimeout(() => {
+        this.initializeOwlCarousel();
+      }, 100);
+    }
+  }
+
   viewRestaurantDetails(restaurantId: number): void {
     this.router.navigate(['/restaurant', restaurantId]);
   }
 
+  viewOrderDetails(orderId: number): void {
+    this.router.navigate(['/order-details', orderId]);
+  }
+
+  getStatusBadgeClass(status: string): string {
+    const statusClasses: { [key: string]: string } = {
+      'PENDING': 'badge-warning',
+      'CONFIRMED': 'badge-info',
+      'PREPARING': 'badge-primary',
+      'READY': 'badge-success',
+      'DELIVERED': 'badge-success',
+      'COMPLETED': 'badge-success',
+      'CANCELLED': 'badge-danger'
+    };
+    return statusClasses[status] || 'badge-secondary';
+  }
+
   getDefaultImage(): string {
     return '/assets/FrontOffice/img/event/event-01.jpg';
+  }
+
+  cancelOrder(orderId: number): void {
+    if (confirm('Are you sure you want to cancel this order?')) {
+      this.orderService.updateOrderStatus(orderId, OrderStatus.CANCELLED).subscribe({
+        next: () => {
+          alert('Order cancelled successfully');
+          this.loadUserOrders();
+        },
+        error: (error) => {
+          console.error('Error cancelling order:', error);
+          alert('Failed to cancel order');
+        }
+      });
+    }
   }
 
   private initializeOwlCarousel(): void {

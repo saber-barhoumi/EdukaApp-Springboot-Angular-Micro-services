@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { OrderService, CreateOrderRequest } from '../../services/order.service';
 import { AuthService } from '../../services/auth-dynamic.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-place-order',
@@ -23,6 +24,7 @@ export class PlaceOrderComponent implements OnInit {
   constructor(
     private orderService: OrderService,
     private authService: AuthService,
+    private notificationService: NotificationService,
     private router: Router
   ) {}
 
@@ -118,6 +120,17 @@ export class PlaceOrderComponent implements OnInit {
       next: (order) => {
         sessionStorage.removeItem('cart');
         sessionStorage.removeItem('restaurantId');
+        
+        // 🔔 CREATE NOTIFICATION FOR ORDER CONFIRMATION
+        this.notificationService.addNotification({
+          id: `order_${Date.now()}`,
+          title: '🎉 Order Placed Successfully!',
+          message: `Your order #${order.id} has been confirmed. Total: $${order.totalAmount || this.getTotal()}`,
+          type: 'success',
+          timestamp: new Date(),
+          read: false
+        });
+        
         alert('Order placed successfully! Order ID: ' + order.id);
         this.isSubmitting = false;
         this.router.navigate(['/restaurants']);

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 // USING DYNAMIC AUTH WITH REAL DATABASE
 import { AuthService, User } from '../../services/auth-dynamic.service';
+import { NotificationCenterComponent } from '../notification-center/notification-center.component';
 // Role values match backend Role.java enum: ADMIN, TEACHER, STUDENT, ASSISTANT, CLIENT
 // import { AuthService } from '../../auth/auth.service';
 // import { KeycloakProfile } from 'keycloak-js';
@@ -10,7 +11,7 @@ import { AuthService, User } from '../../services/auth-dynamic.service';
 @Component({
   selector: 'app-header-front',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, NotificationCenterComponent],
   templateUrl: './header-front.component.html',
   styleUrls: ['./header-front.component.css']
 })

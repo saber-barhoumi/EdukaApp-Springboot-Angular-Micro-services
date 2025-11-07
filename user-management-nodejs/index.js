@@ -20,6 +20,11 @@ mongoose.connect(process.env.MONGODB_URI, {
   useUnifiedTopology: true
 });
 
+// Health check endpoint
+app.get('/api/auth/health', (req, res) => {
+  res.status(200).send('User Management Service is running!');
+});
+
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 
