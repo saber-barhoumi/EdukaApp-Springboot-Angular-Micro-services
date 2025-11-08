@@ -2,9 +2,10 @@
 
 export enum Disponible {
   DISPONIBLE = 'DISPONIBLE',
-  EMPRUNTE = 'EMPRUNTE',
-  RESERVE = 'RESERVE'
+  NON_DISPONIBLE = 'NON_DISPONIBLE'
 }
 
-// Utilitaire pour obtenir toutes les valeurs (pour les select)
 export const DisponibleValues = Object.values(Disponible);
+
+
+// Utilitaire pour obtenir toutes les valeurs (pour les select)

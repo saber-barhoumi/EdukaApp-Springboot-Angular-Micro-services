@@ -1,0 +1,83 @@
+<p>editlivre works!</p>
+<!-- src/app/BackOffice/pages-back/editlivre/editlivre.component.html -->
+
+<div class="container">
+  <!-- Chargement -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Chargement du livre...</p>
+  </div>
+
+  <!-- Message d'erreur -->
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+    <button class="btn btn-secondary" (click)="onCancel()">
+      Retour à la liste
+    </button>
+  </div>
+
+  <!-- Formulaire -->
+  <div *ngIf="!loading && !errorMessage" class="card">
+    <div class="card-header">
+      <h2>✏️ Modifier le livre #{{ livre.livreid }}</h2>
+    </div>
+
+    <div class="card-body">
+      <form (ngSubmit)="onSubmit()" #livreForm="ngForm">
+        
+        <!-- Titre -->
+        <div class="form-group">
+          <label for="titre">Titre du livre <span class="required">*</span></label>
+          <input 
+            type="text" 
+            id="titre" 
+            class="form-control"
+            [(ngModel)]="livre.titre" 
+            name="titre"
+            required
+            placeholder="Ex: Les Misérables"
+          >
+        </div>
+
+        <!-- Catégorie -->
+        <div class="form-group">
+          <label for="categorie">Catégorie <span class="required">*</span></label>
+          <input 
+            type="text" 
+            id="categorie" 
+            class="form-control"
+            [(ngModel)]="livre.categorie" 
+            name="categorie"
+            required
+            placeholder="Ex: Roman, Science, Histoire..."
+          >
+        </div>
+
+        <!-- Disponibilité -->
+       <select 
+  id="diponible" 
+  class="form-control"
+  [(ngModel)]="livre.diponible" 
+  name="diponible"
+  required
+>
+  <option *ngFor="let option of disponibleOptions" [ngValue]="option">
+  {{ option }}
+</option>
+
+</select>
+
+
+        <!-- Boutons d'action -->
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            💾 Enregistrer les modifications
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">
+            ❌ Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

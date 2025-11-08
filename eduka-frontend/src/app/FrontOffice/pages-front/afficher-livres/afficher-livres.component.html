@@ -1,0 +1,40 @@
+<p>afficher-livres works!</p>
+<div class="container mt-4">
+
+  <h2>📚 Liste des livres</h2>
+
+  <div *ngIf="loading" class="alert alert-info">Chargement des livres...</div>
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+  <table class="table table-striped" *ngIf="!loading && livres.length > 0">
+    <thead>
+      <tr>
+        <th>Titre</th>
+        <th>Catégorie</th>
+        <th>Disponibilité</th>
+        <th>Action</th> <!-- Nouvelle colonne pour le bouton -->
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let livre of livres">
+        <td>{{ livre.titre }}</td>
+        <td>{{ livre.categorie }}</td>
+        <td>{{ livre.diponible }}</td>
+        <td>
+          <!-- Bouton seulement si le livre est DISPONIBLE -->
+          <button *ngIf="livre.diponible === 'DISPONIBLE'"
+                  (click)="reserverLivre(livre.livreid)"
+                  class="btn btn-primary btn-sm">
+            Réserver
+          </button>
+          <span *ngIf="livre.diponible !== 'DISPONIBLE'">Indisponible</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!loading && livres.length === 0" class="alert alert-warning">
+    Aucun livre disponible pour le moment.
+  </div>
+
+</div>

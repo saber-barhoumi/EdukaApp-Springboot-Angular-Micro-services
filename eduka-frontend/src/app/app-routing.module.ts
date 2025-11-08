@@ -11,6 +11,10 @@ import { StudentPageComponent } from './FrontOffice/pages-front/student-page/stu
 import { ClientPageComponent } from './FrontOffice/pages-front/client-page/client-page.component';
 import { AdminPageComponent } from './BackOffice/pages-back/admin-page/admin-page.component';
 import { MenuItemsComponent } from './FrontOffice/menu-items/menu-items.component';
+import { AddlivreComponent } from './BackOffice/pages-back/addlivre/addlivre.component';
+import { ListlivreComponent } from './BackOffice/pages-back/listlivre/listlivre.component';
+import { EditlivreComponent } from './BackOffice/pages-back/editlivre/editlivre.component';
+import { AfficherLivresComponent } from './FrontOffice/pages-front/afficher-livres/afficher-livres.component';
 // Role values match backend Role.java enum: ADMIN, TEACHER, STUDENT, ASSISTANT, CLIENT
 
 export const routes: Routes = [
@@ -41,6 +45,9 @@ export const routes: Routes = [
         data: { roles: ['CLIENT'] }
       },
 
+      { path: 'livres', component: AfficherLivresComponent },
+
+
       // Public routes for FrontOffice
     ]
   },
@@ -65,8 +72,34 @@ export const routes: Routes = [
       { path: '', component: AdminPageComponent },
       { path: 'menu-items', loadComponent: () => import('./BackOffice/menu-items-back/menu-items-back.component').then(m => m.MenuItemsBackComponent) },
       // Protected routes for BackOffice
+ 
+
+         { 
+        path: 'addlivre', 
+        component:AddlivreComponent
+      },
+         { 
+        path: 'listlivre', 
+        component:ListlivreComponent
+      },
+        { 
+        path: 'editLivre/:id', 
+        component:EditlivreComponent
+      },
+     
+
+
+
     ]
   },
+
+
+
+
+
+
+
+  
   {
     path: 'admin',
     redirectTo: '/admin/1',

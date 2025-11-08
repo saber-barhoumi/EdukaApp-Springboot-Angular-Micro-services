@@ -1,0 +1,91 @@
+<p>listlivre works!</p>
+<!-- src/app/BackOffice/pages-back/listlivre/listlivre.component.html -->
+
+<div class="container">
+  <div class="header">
+    <h1>📚 Gestion des Livres</h1>
+    <button class="btn btn-primary" (click)="goToAdd()">
+      ➕ Ajouter un livre
+    </button>
+  </div>
+
+  <!-- Barre de recherche -->
+  <div class="search-box">
+    <input 
+      type="text" 
+      class="search-input"
+      [(ngModel)]="searchTerm"
+      placeholder="🔍 Rechercher par titre ou catégorie..."
+    >
+  </div>
+
+  <!-- Chargement -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Chargement des livres...</p>
+  </div>
+
+  <!-- Message d'erreur -->
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Liste vide -->
+  <div *ngIf="!loading && filteredLivres.length === 0" class="empty-state">
+    <p>📭 Aucun livre trouvé</p>
+    <button class="btn btn-primary" (click)="goToAdd()">
+      Ajouter le premier livre
+    </button>
+  </div>
+
+  <!-- Table des livres -->
+  <div *ngIf="!loading && filteredLivres.length > 0" class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Titre</th>
+          <th>Catégorie</th>
+          <th>Disponibilité</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let livre of filteredLivres">
+          <td>{{ livre.livreid }}</td>
+          <td>{{ livre.titre }}</td>
+          <td>{{ livre.categorie }}</td>
+          <td>
+            <span [class]="'badge ' + getDisponibiliteClass(livre.diponible)">
+              {{ livre.diponible }}
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button 
+                class="btn btn-edit" 
+                (click)="editLivre(livre.livreid!)"
+                title="Modifier"
+              >
+                ✏️
+              </button>
+              <button 
+                class="btn btn-delete" 
+                (click)="deleteLivre(livre.livreid!, livre.titre)"
+                title="Supprimer"
+              >
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Statistiques -->
+  <div *ngIf="!loading && livres.length > 0" class="stats">
+    <p>Total : <strong>{{ livres.length }}</strong> livre(s)</p>
+    <p *ngIf="searchTerm">Résultats filtrés : <strong>{{ filteredLivres.length }}</strong></p>
+  </div>
+</div>

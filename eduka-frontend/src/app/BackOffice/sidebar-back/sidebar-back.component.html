@@ -301,6 +301,40 @@
                     <use href="https://admin.pixelstrap.net/edmin/assets/svg/iconly-sprite.svg#Search"></use>
                   </svg><span>Search Result</span></a>
               </li>
+
+
+
+<li class="line"></li>
+<li class="sidebar-main-title">Bibliothèque</li>
+
+<li class="sidebar-list"> 
+  <svg class="pinned-icon">
+    <use href="https://admin.pixelstrap.net/edmin/assets/svg/iconly-sprite.svg#Pin"></use>
+  </svg>
+  <a class="sidebar-link" [routerLink]="['/admin', 1, 'listlivre']" routerLinkActive="active">
+    <svg class="stroke-icon">
+      <use href="https://admin.pixelstrap.net/edmin/assets/svg/iconly-sprite.svg#Document"></use>
+    </svg>
+    <span>Liste des livres</span>
+  </a>
+</li>
+
+<li class="sidebar-list"> 
+  <svg class="pinned-icon">
+    <use href="https://admin.pixelstrap.net/edmin/assets/svg/iconly-sprite.svg#Pin"></use>
+  </svg>
+  <a class="sidebar-link" [routerLink]="['/admin', 1, 'addlivre']" routerLinkActive="active">
+    <svg class="stroke-icon">
+      <use href="https://admin.pixelstrap.net/edmin/assets/svg/iconly-sprite.svg#Plus"></use>
+    </svg>
+    <span>Ajouter un livre</span>
+  </a>
+</li>
+
+
+
+
+
               <li class="line"></li>
               <li class="sidebar-main-title">Components</li>
               <li class="sidebar-list"> 

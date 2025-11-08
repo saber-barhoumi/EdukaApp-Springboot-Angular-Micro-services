@@ -31,6 +31,14 @@ export class HeaderFrontComponent implements OnInit {
     });
   }
 
+    goToLivres() {
+    // Naviguer vers la route
+    this.router.navigate(['/client/1/afficher-livres']).then(() => {
+      // Scroll vers le haut après navigation
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
   navigateToLogin(): void {
     // Navigate to custom login page instead of Keycloak redirect
     this.router.navigate(['/login']);
