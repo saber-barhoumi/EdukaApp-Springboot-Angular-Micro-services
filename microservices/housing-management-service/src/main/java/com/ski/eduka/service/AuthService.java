@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class AuthService {
     public UserDto register(RegisterRequest request) {
@@ -70,4 +72,17 @@ public class AuthService {
         dto.setPhoneNumber(user.getPhoneNumber());
         return dto;
     }
+
+
+
+    public List<User> getListOfUsers() {
+        return userRepository.findAll();
+    }
+
+
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
+
 }

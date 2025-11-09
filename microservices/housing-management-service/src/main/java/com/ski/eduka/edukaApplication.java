@@ -5,7 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
-@EnableFeignClients(basePackages = "com.ski.eduka.client")
+//@EnableFeignClients(basePackages = "com.ski.eduka.client")
+@EnableFeignClients
 public class edukaApplication {
 
 	public static void main(String[] args) {
