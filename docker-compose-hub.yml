@@ -69,6 +69,66 @@ services:
     networks:
       - eduka-network
 
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb-eduka
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=eduka-users
+    networks:
+      - eduka-network
+
+  # User Management Service (Node.js)
+  user-management-nodejs:
+    image: saberbarhoumi11/user-management-nodejs:1.0
+    container_name: user-management-nodejs-eduka
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/eduka-users
+      - JWT_SECRET=your_jwt_secret_here_change_in_production
+      - PORT=3000
+    depends_on:
+      - mongodb
+    networks:
+      - eduka-network
+
+  # MySQL Database for Admin Management Service
+  mysqldb:
+    image: mysql:8.0
+    container_name: mysql-eduka
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=admin_management_db
+    networks:
+      - eduka-network
+
+  # Admin Management Service - MySQL Database + OpenFeign
+  admin-management-service:
+    image: saberbarhoumi11/admin-management-service:1.0
+    container_name: admin-management-service-eduka
+    ports:
+      - "8087:8087"
+    depends_on:
+      - mysqldb
+      - eureka-server
+      - user-management-nodejs
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/admin_management_db?createDatabaseIfNotExist=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - USER_SERVICE_URL=http://user-management-nodejs:3000
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - eduka-network
+
 networks:
   eduka-network:
     driver: bridge

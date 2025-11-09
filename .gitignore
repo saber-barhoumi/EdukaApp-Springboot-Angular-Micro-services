@@ -154,3 +154,23 @@ Desktop.ini
 .DS_Store
 .AppleDouble
 .LSOverride
+
+# H2 Database files (local databases that change frequently)
+*.db
+*.lock.db
+*.mv.db
+*.trace.db
+keycloak-data/h2/*.db
+keycloak-data/h2/*.lock.db
+keycloak-data/h2/*.mv.db
+keycloak-data/h2/*.trace.db
+
+# Docker volumes and data
+keycloak-data/h2/
+restaurant-data/
+mongodb-data/
+rabbitmq-data/
+
+# Uploaded files
+uploads/
+microservices/*/uploads/
