@@ -104,6 +104,12 @@
 		</dependency>
 
 
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+
+
 		<!-- 🧪 TEST -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

@@ -11,22 +11,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/emprunts")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class EmpruntController {
 
     private final EmpruntServiceImpl empruntService;
 
-    /**
-     * ✅ Créer un emprunt pour un livre (l'utilisateur connecté sera automatiquement associé)
-     */
+
     @PostMapping("/add/{livreId}")
-    public ResponseEntity<Emprunt> addEmprunt(@PathVariable Long livreId) {
-        Emprunt emprunt = empruntService.addEmprunt(livreId);
+    public ResponseEntity<Emprunt> addEmprunt(
+            @PathVariable Long livreId,
+            @RequestHeader("Authorization") String token) {
+        Emprunt emprunt = empruntService.addEmprunt(livreId, token);
         return ResponseEntity.ok(emprunt);
     }
 
     /**
-     * ✏️ Mettre à jour un emprunt (par ex. retour du livre)
+     * ✏️ Mettre à jour un emprunt (ex: date de retour ou statut)
      */
     @PutMapping("/update/{empruntId}")
     public ResponseEntity<Emprunt> updateEmprunt(
@@ -46,7 +45,7 @@ public class EmpruntController {
     }
 
     /**
-     * 🔍 Récupérer un emprunt par son ID
+     * 🔍 Récupérer un emprunt par ID
      */
     @GetMapping("/{empruntId}")
     public ResponseEntity<Emprunt> getEmpruntById(@PathVariable Long empruntId) {
@@ -55,7 +54,7 @@ public class EmpruntController {
     }
 
     /**
-     * 📚 Récupérer tous les emprunts (pour admin ou test)
+     * 📚 Récupérer tous les emprunts (admin ou test)
      */
     @GetMapping("/all")
     public ResponseEntity<List<Emprunt>> getAllEmprunts() {
@@ -63,11 +62,12 @@ public class EmpruntController {
     }
 
     /**
-     * 👤 Récupérer les emprunts de l'utilisateur actuellement connecté
+     * 👤 Récupérer les emprunts de l'utilisateur connecté
      */
     @GetMapping("/my-emprunts")
-    public ResponseEntity<List<Emprunt>> getEmpruntsByCurrentUser() {
-        List<Emprunt> emprunts = empruntService.getEmpruntsByCurrentUser();
+    public ResponseEntity<List<Emprunt>> getEmpruntsByCurrentUser(
+            @RequestHeader("Authorization") String token) {
+        List<Emprunt> emprunts = empruntService.getEmpruntsByUserId(token);
         return ResponseEntity.ok(emprunts);
     }
 }
