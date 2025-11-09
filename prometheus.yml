@@ -1,0 +1,82 @@
+# Prometheus Configuration for EdukaApp Microservices Monitoring
+# This file configures Prometheus to scrape metrics from all Spring Boot services
+
+global:
+  scrape_interval: 5s      # How often to scrape targets (every 5 seconds)
+  evaluation_interval: 5s  # How often to evaluate rules
+  
+  # External labels attached to any time series or alerts
+  external_labels:
+    monitor: 'eduka-app-monitor'
+    environment: 'development'
+
+# Scrape configurations for each microservice
+scrape_configs:
+  
+  # Eureka Server - Service Discovery
+  - job_name: 'eureka-server'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['eureka-server:8761']
+        labels:
+          service: 'eureka-server'
+          type: 'infrastructure'
+  
+  # Config Server - Centralized Configuration
+  - job_name: 'config-server'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['config-server:8885']
+        labels:
+          service: 'config-server'
+          type: 'infrastructure'
+  
+  # API Gateway - Secured Gateway
+  - job_name: 'api-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['api-gateway:8888']
+        labels:
+          service: 'api-gateway'
+          type: 'infrastructure'
+  
+  # Restaurant Management Service
+  - job_name: 'restaurant-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['restaurant-management-service:8083']
+        labels:
+          service: 'restaurant-management'
+          type: 'business-service'
+  
+  # Notification Service
+  - job_name: 'notification-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['notification-service:8086']
+        labels:
+          service: 'notification'
+          type: 'business-service'
+  
+  # Admin Management Service
+  - job_name: 'admin-management-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['admin-management-service:8087']
+        labels:
+          service: 'admin-management'
+          type: 'business-service'
+  
+  # RabbitMQ Monitoring (if RabbitMQ exporter is enabled)
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets: ['rabbitmq:15692']  # RabbitMQ Prometheus plugin port
+        labels:
+          service: 'rabbitmq'
+          type: 'messaging'
+    # This will only work if RabbitMQ Prometheus plugin is enabled
+    # Otherwise, metrics will not be available
+
+# Alerting rules can be added here (optional)
+# rule_files:
+#   - "alert_rules.yml"
