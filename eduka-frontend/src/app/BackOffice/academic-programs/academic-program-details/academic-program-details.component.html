@@ -1,0 +1,13 @@
+<div class="container" *ngIf="program">
+  <h2>Academic Program Details</h2>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">{{ program.programName }}</h5>
+      <p class="card-text"><strong>Program Code:</strong> {{ program.programCode }}</p>
+      <p class="card-text"><strong>Description:</strong> {{ program.description }}</p>
+      <p class="card-text"><strong>Duration:</strong> {{ program.duration }}</p>
+      <p class="card-text"><strong>Status:</strong> {{ program.isActive ? 'Active' : 'Inactive' }}</p>
+    </div>
+  </div>
+  <button class="btn btn-secondary mt-3" (click)="back()">Back to List</button>
+</div>

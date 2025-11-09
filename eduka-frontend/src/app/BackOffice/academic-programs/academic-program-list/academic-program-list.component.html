@@ -1,0 +1,35 @@
+<div class="container">
+  <h2>Academic Programs</h2>
+  <button class="btn btn-primary mb-3" (click)="addProgram()">Add New Program</button>
+
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Program Name</th>
+          <th>Program Code</th>
+          <th>Description</th>
+          <th>Duration</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let program of programs">
+          <td>{{ program.id }}</td>
+          <td>{{ program.programName }}</td>
+          <td>{{ program.programCode }}</td>
+          <td>{{ program.description }}</td>
+          <td>{{ program.duration }}</td>
+          <td>{{ program.isActive ? 'Active' : 'Inactive' }}</td>
+          <td>
+            <button class="btn btn-info me-2" (click)="viewDetails(program.id!)">View</button>
+            <button class="btn btn-warning me-2" (click)="editProgram(program.id!)">Edit</button>
+            <button class="btn btn-danger" (click)="deleteProgram(program.id!)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

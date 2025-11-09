@@ -41,9 +41,12 @@ export class RoleGuard implements CanActivate {
 
   private redirectToUserRole(user: User): void {
     const role = user.role;
-    const userId = user.id;
+    const userId = user._id || user.id; // Support both MongoDB _id and SQL id
     
-    switch (role) {
+    // Normalize role to uppercase for comparison
+    const normalizedRole = role?.toUpperCase();
+    
+    switch (normalizedRole) {
       case 'ADMIN':
         this.router.navigate(['/admin', userId]);
         break;
@@ -59,7 +62,12 @@ export class RoleGuard implements CanActivate {
       case 'CLIENT':
         this.router.navigate(['/client', userId]);
         break;
+      case 'USER':
+        // Default user role - navigate to home
+        this.router.navigate(['/']);
+        break;
       default:
+        console.warn('Unknown role:', role, '- redirecting to home');
         this.router.navigate(['/']);
         break;
     }

@@ -1,0 +1,35 @@
+<div class="container">
+  <h2>Departments</h2>
+  <button class="btn btn-primary mb-3" (click)="addDepartment()">Add New Department</button>
+
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Code</th>
+          <th>Description</th>
+          <th>Location</th>
+          <th>Head of Department</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let dept of departments">
+          <td>{{ dept.id }}</td>
+          <td>{{ dept.departmentName }}</td>
+          <td>{{ dept.departmentCode }}</td>
+          <td>{{ dept.description }}</td>
+          <td>{{ dept.location }}</td>
+          <td>{{ dept.headOfDepartment }}</td>
+          <td>
+            <button class="btn btn-info me-2" (click)="viewDetails(dept.id!)">View</button>
+            <button class="btn btn-warning me-2" (click)="editDepartment(dept.id!)">Edit</button>
+            <button class="btn btn-danger" (click)="deleteDepartment(dept.id!)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
