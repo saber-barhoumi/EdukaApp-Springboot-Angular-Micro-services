@@ -97,6 +97,18 @@
 			<optional>true</optional>
 		</dependency>
 
+		<!-- Spring Boot Actuator for Monitoring -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!-- Micrometer Prometheus Registry for Metrics -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 
 		<!-- Test Dependencies -->
 		<dependency>
