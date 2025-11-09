@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/Livre")
+@RequestMapping("/api/livres")
 @RequiredArgsConstructor
 public class LivreController {
     @Autowired

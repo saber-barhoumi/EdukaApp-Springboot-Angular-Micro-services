@@ -9,7 +9,7 @@ import { Livre, LivreDto } from '../models/livre.models';
   providedIn: 'root'
 })
 export class LivreService {
-  private apiUrl = 'http://localhost:8084/Livre';
+  private apiUrl = 'http://localhost:8084/api/livres';
 
   constructor(private http: HttpClient) {}
 
