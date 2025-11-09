@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.3</version>
+		<version>3.1.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.Ski</groupId>
-	<artifactId>eduka</artifactId>
+		<groupId>com.eduka</groupId>
+	<artifactId>admin-management-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>eduka</name>
-	<description>eduka</description>
+	<name>admin-management-service</name>
+	<description>Admin Management Service for Eduka</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -87,6 +87,34 @@
 		</dependency>
 
 
+		<!-- Spring Cloud Dependencies -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bootstrap</artifactId>
+		</dependency>
+
+		<!-- OpenFeign for inter-service communication -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+
+		<!-- Spring Cloud LoadBalancer (replacement for Ribbon) -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-loadbalancer</artifactId>
+		</dependency>
+
+		<!-- Circuit Breaker with Resilience4j (optional but recommended) -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+		</dependency>
+
 		<!-- Test Dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -133,7 +161,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>com.ski.eduka.edukaApplication</mainClass>
+						<mainClass>com.eduka.adminmanagement.AdminManagementApplication</mainClass>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>

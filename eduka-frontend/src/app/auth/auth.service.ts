@@ -14,7 +14,7 @@ export class AuthService {
   private isAuthenticated = new BehaviorSubject<boolean>(false);
 
   constructor(private http: HttpClient) {
-    this.keycloak = new Keycloak(keycloakConfig);
+    this.keycloak = new Keycloak(keycloakConfig.config);
     this.initializeAuth();
   }
 
@@ -38,11 +38,12 @@ export class AuthService {
 
   async loginWithCredentials(username: string, password: string): Promise<void> {
     try {
-      const keycloakUrl = `${keycloakConfig.url}/realms/${keycloakConfig.realm}/protocol/openid-connect/token`;
+      const keycloakUrl = `${this.keycloak.authServerUrl}/realms/${this.keycloak.realm}/protocol/openid-connect/token`;
       
       const body = new URLSearchParams();
       body.set('grant_type', 'password');
-      body.set('client_id', keycloakConfig.clientId);
+      if (!this.keycloak.clientId) throw new Error('Client ID not configured');
+      body.set('client_id', this.keycloak.clientId);
       body.set('username', username);
       body.set('password', password);
       body.set('scope', 'openid profile email'); // Add required scopes
@@ -52,7 +53,7 @@ export class AuthService {
       };
 
       console.log('Attempting login with URL:', keycloakUrl);
-      console.log('Client ID:', keycloakConfig.clientId);
+      console.log('Client ID:', this.keycloak.clientId);
       console.log('Username:', username);
 
       const response = await this.http.post<any>(keycloakUrl, body.toString(), { headers }).toPromise();

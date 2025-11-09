@@ -1,9 +1,11 @@
 import { KeycloakConfig } from 'keycloak-js';
 
-export const keycloakConfig: KeycloakConfig = {
-  url: 'http://localhost:8080', // Keycloak server URL (standard port)
-  realm: 'eduka-realm', // Your Keycloak realm name
-  clientId: 'eduka-client' // Updated to match backend configuration
+export const keycloakConfig = {
+  config: {
+    url: 'http://localhost:8080',
+    realm: 'eduka-realm',
+    clientId: 'eduka-client'
+  } as KeycloakConfig
 };
 
 export const environment = {

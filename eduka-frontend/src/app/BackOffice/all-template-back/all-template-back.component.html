@@ -5,22 +5,22 @@
   
   <div class="page-body">
     <div class="container-fluid">
-      <!-- Dashboard Cards Section -->
-      <div class="row">
+      <!-- Dashboard Cards Section - Only show on main dashboard -->
+      <div *ngIf="showDashboard" class="row">
         <div class="col-12">
           <app-dashboard-cards></app-dashboard-cards>
         </div>
       </div>
       
-      <!-- Statistics Cards Section -->
-      <div class="row">
+      <!-- Statistics Cards Section - Only show on main dashboard -->
+      <div *ngIf="showDashboard" class="row">
         <div class="col-12">
           <app-statistics-cards></app-statistics-cards>
         </div>
       </div>
       
-      <!-- Main Content Section -->
-      <div class="row">
+      <!-- Main Content Section - Only show on main dashboard -->
+      <div *ngIf="showDashboard" class="row">
         <div class="col-md-8">
           <app-invoice-table></app-invoice-table>
         </div>
@@ -30,7 +30,7 @@
       </div>
     </div>
     
-    <!-- Router Outlet pour le contenu dynamique -->
+    <!-- Router Outlet pour le contenu dynamique - Always visible for child routes -->
     <router-outlet></router-outlet>
   </div>
 </div>

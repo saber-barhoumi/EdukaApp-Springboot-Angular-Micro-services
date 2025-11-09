@@ -1,0 +1,16 @@
+<div class="container" *ngIf="department">
+  <h2>Department Details</h2>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">{{ department.departmentName }}</h5>
+      <p class="card-text"><strong>Department Code:</strong> {{ department.departmentCode }}</p>
+      <p class="card-text"><strong>Description:</strong> {{ department.description }}</p>
+      <p class="card-text"><strong>Location:</strong> {{ department.location }}</p>
+      <p class="card-text"><strong>Head of Department:</strong> {{ department.headOfDepartment }}</p>
+      <p class="card-text" *ngIf="academicProgram">
+        <strong>Academic Program:</strong> {{ academicProgram.programName }}
+      </p>
+    </div>
+  </div>
+  <button class="btn btn-secondary mt-3" (click)="back()">Back to List</button>
+</div>

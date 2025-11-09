@@ -151,8 +151,12 @@ export class AuthService {
    */
   private navigateByRole(user: User): void {
     const role = user.role;
-    const userId = user.id;
-    switch (role) {
+    const userId = user._id || user.id; // Support both MongoDB _id and SQL id
+    
+    // Normalize role to uppercase for comparison
+    const normalizedRole = role?.toUpperCase();
+    
+    switch (normalizedRole) {
       case 'ADMIN':
         this.router.navigate(['/admin', userId]);
         break;
@@ -168,7 +172,12 @@ export class AuthService {
       case 'CLIENT':
         this.router.navigate(['/client', userId]);
         break;
+      case 'USER':
+        // Default user role - navigate to home page
+        this.router.navigate(['/']);
+        break;
       default:
+        console.warn('Unknown role:', role, '- navigating to home');
         this.router.navigate(['/']);
         break;
     }
@@ -234,19 +243,28 @@ export class AuthService {
   }
 
   /**
-   * Check if user has any of the specified roles
+   * Check if user has any of the specified roles (case-insensitive)
    */
   hasAnyRole(roles: string[]): boolean {
     const currentUser = this.getCurrentUser();
-    return currentUser ? roles.includes(currentUser.role) : false;
+    if (!currentUser || !currentUser.role) return false;
+    
+    // Normalize both user role and required roles to uppercase for comparison
+    const userRole = currentUser.role.toUpperCase();
+    const normalizedRoles = roles.map(r => r.toUpperCase());
+    
+    return normalizedRoles.includes(userRole);
   }
 
   /**
-   * Check if user has specific role
+   * Check if user has specific role (case-insensitive)
    */
   hasRole(role: string): boolean {
     const currentUser = this.getCurrentUser();
-    return currentUser ? currentUser.role === role : false;
+    if (!currentUser || !currentUser.role) return false;
+    
+    // Normalize both roles to uppercase for comparison
+    return currentUser.role.toUpperCase() === role.toUpperCase();
   }
 
   /**
