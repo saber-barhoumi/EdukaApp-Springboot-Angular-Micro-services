@@ -1,0 +1,499 @@
+<div class="student-ai-insights-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h1 class="page-title">🤖 {{ getLanguageSpecificText('dashboard') }}</h1>
+              <p class="page-subtitle">AI-Powered Learning Insights & Recommendations</p>
+            </div>
+            
+            <!-- Language Selector -->
+            <div class="language-selector">
+              <div class="dropdown">
+                <button class="btn btn-outline-light dropdown-toggle" type="button" 
+                        data-bs-toggle="dropdown">
+                  {{ getCurrentLanguageFlag() }}
+                  {{ getCurrentLanguageName() }}
+                </button>
+                <ul class="dropdown-menu">
+                  <li *ngFor="let lang of interfaceLanguages">
+                    <a class="dropdown-item" (click)="changeLanguage(lang.code)">
+                      {{ lang.flag }} {{ lang.name }}
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="action-buttons mt-3">
+            <button class="btn btn-primary me-2" (click)="refreshInsights()">
+              <i class="fas fa-sync-alt me-1"></i> Refresh
+            </button>
+            <button class="btn btn-secondary me-2" (click)="printReport()">
+              <i class="fas fa-print me-1"></i> Print
+            </button>
+            <button class="btn btn-info me-2" (click)="downloadReport()">
+              <i class="fas fa-download me-1"></i> Download
+            </button>
+            <button class="btn btn-success" (click)="shareReport()">
+              <i class="fas fa-share-alt me-1"></i> Share
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="container">
+      <div class="text-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
+        <h4 class="mt-3">Loading your AI insights...</h4>
+        <p class="text-muted">Analyzing your performance data</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error && !isLoading">
+    <div class="container">
+      <div class="alert alert-danger">
+        <h5>❌ Error Loading Insights</h5>
+        <p>{{ error }}</p>
+        <button class="btn btn-primary" (click)="refreshInsights()">
+          Try Again
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content" *ngIf="studentInsights && !isLoading && !error">
+    <div class="container-fluid">
+      
+      <!-- Dashboard Stats Row -->
+      <div class="row dashboard-stats mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="stat-card overall-score">
+            <div class="stat-icon">{{ getScoreIcon(dashboardStats.overallScore) }}</div>
+            <div class="stat-content">
+              <h3>{{ dashboardStats.overallScore }}%</h3>
+              <p>{{ getLanguageSpecificText('overallScore') }}</p>
+              <span class="badge" [ngClass]="'bg-' + getScoreColor(dashboardStats.overallScore)">
+                {{ getScoreLabel(dashboardStats.overallScore) }}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="stat-card improvement">
+            <div class="stat-icon">{{ getImprovementIcon(dashboardStats.improvement) }}</div>
+            <div class="stat-content">
+              <h3>+{{ dashboardStats.improvement }}%</h3>
+              <p>{{ getLanguageSpecificText('improvement') }}</p>
+              <small class="text-muted">vs. last month</small>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="stat-card strongest-subject">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-content">
+              <h3>{{ dashboardStats.strongestSubject }}</h3>
+              <p>{{ getLanguageSpecificText('strongestSubject') }}</p>
+              <small class="text-success">Your best performance</small>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="stat-card recommendations">
+            <div class="stat-icon">💡</div>
+            <div class="stat-content">
+              <h3>{{ dashboardStats.recommendationsCount }}</h3>
+              <p>{{ getLanguageSpecificText('recommendations') }}</p>
+              <small class="text-info">Personalized tips</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Analysis Sections -->
+      <div class="row">
+        
+        <!-- Academic Performance -->
+        <div class="col-lg-6 mb-4">
+          <div class="analysis-card academic-performance">
+            <div class="card-header">
+              <h4>📊 {{ getLanguageSpecificText('academicPerformance') }}</h4>
+            </div>
+            <div class="card-body">
+              <!-- Academic Chart Placeholder -->
+              <div class="chart-container">
+                <canvas id="academicChart" width="400" height="200"></canvas>
+              </div>
+              
+              <!-- Overall Assessment Summary -->
+              <div class="assessment-summary mt-3" *ngIf="studentInsights.latestAnalysis.overallAssessment">
+                <h6>Overall Assessment:</h6>
+                <div class="assessment-details">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="metric-item">
+                        <span class="metric-label">Academic Standing:</span>
+                        <span class="metric-value badge bg-primary">{{ studentInsights.latestAnalysis.overallAssessment.academicStanding }}</span>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="metric-item">
+                        <span class="metric-label">Risk Level:</span>
+                        <span class="metric-value badge" [class]="'bg-' + getRiskLevelColor(studentInsights.latestAnalysis.overallAssessment.riskLevel)">
+                          {{ studentInsights.latestAnalysis.overallAssessment.riskLevel }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mt-2">
+                    <div class="col-md-6">
+                      <div class="metric-item">
+                        <span class="metric-label">Improvement Potential:</span>
+                        <span class="metric-value">{{ (studentInsights.latestAnalysis.overallAssessment.improvementPotential * 100) | number:'1.0-0' }}%</span>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="metric-item">
+                        <span class="metric-label">Dropout Risk:</span>
+                        <span class="metric-value">{{ (studentInsights.latestAnalysis.overallAssessment.dropoutProbability * 100) | number:'1.0-0' }}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Language Proficiency -->
+        <div class="col-lg-6 mb-4">
+          <div class="analysis-card language-proficiency">
+            <div class="card-header">
+              <h4>🗣️ {{ getLanguageSpecificText('languageProficiency') }}</h4>
+            </div>
+            <div class="card-body">
+              <!-- Language Chart Placeholder -->
+              <div class="chart-container">
+                <canvas id="languageChart" width="400" height="200"></canvas>
+              </div>
+              
+              <!-- Language Breakdown -->
+              <div class="language-breakdown mt-3">
+                <div class="language-item arabic">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="language-name">🇹🇳 العربية (Arabic)</span>
+                    <div class="language-score">
+                      <span class="score">{{ getLevelScore(studentInsights.latestAnalysis.languageAnalysis.arabic.currentLevel) }}%</span>
+                      <div class="progress ms-2" style="width: 100px;">
+                        <div class="progress-bar bg-success" 
+                             [style.width.%]="getLevelScore(studentInsights.latestAnalysis.languageAnalysis.arabic.currentLevel)">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="language-item french">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="language-name">🇫🇷 Français (French)</span>
+                    <div class="language-score">
+                      <span class="score">{{ getLevelScore(studentInsights.latestAnalysis.languageAnalysis.french.currentLevel) }}%</span>
+                      <div class="progress ms-2" style="width: 100px;">
+                        <div class="progress-bar bg-primary" 
+                             [style.width.%]="getLevelScore(studentInsights.latestAnalysis.languageAnalysis.french.currentLevel)">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="language-item english">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="language-name">🇺🇸 English</span>
+                    <div class="language-score">
+                      <span class="score">{{ getLevelScore(studentInsights.latestAnalysis.languageAnalysis.english.currentLevel) }}%</span>
+                      <div class="progress ms-2" style="width: 100px;">
+                        <div class="progress-bar bg-warning" 
+                             [style.width.%]="getLevelScore(studentInsights.latestAnalysis.languageAnalysis.english.currentLevel)">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Language Summary -->
+              <div class="language-summary mt-3">
+                <div class="alert alert-primary">
+                  <strong>Language Skills Overview:</strong> 
+                  Your language proficiencies have been analyzed for personalized learning recommendations.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Behavioral Insights and Recommendations Row -->
+      <div class="row">
+        
+        <!-- Behavioral Insights -->
+        <div class="col-lg-6 mb-4">
+          <div class="analysis-card behavioral-insights">
+            <div class="card-header">
+              <h4>👤 {{ getLanguageSpecificText('behavioralInsights') }}</h4>
+            </div>
+            <div class="card-body">
+              <div class="behavior-metrics">
+                <div class="behavior-item">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="behavior-name">📝 Class Participation</span>
+                    <div class="behavior-score">
+                      <span class="score">{{ studentInsights.latestAnalysis.behavioralInsights.participation }}%</span>
+                      <div class="progress ms-2" style="width: 100px;">
+                        <div class="progress-bar bg-info" 
+                             [style.width.%]="studentInsights.latestAnalysis.behavioralInsights.participation">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="behavior-item">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="behavior-name">📚 Homework Completion</span>
+                    <div class="behavior-score">
+                      <span class="score">{{ studentInsights.latestAnalysis.behavioralInsights.homework }}%</span>
+                      <div class="progress ms-2" style="width: 100px;">
+                        <div class="progress-bar bg-warning" 
+                             [style.width.%]="studentInsights.latestAnalysis.behavioralInsights.homework">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="behavior-item">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="behavior-name">🎯 Motivation Level</span>
+                    <div class="behavior-score">
+                      <span class="score">{{ studentInsights.latestAnalysis.behavioralInsights.motivation }}%</span>
+                      <div class="progress ms-2" style="width: 100px;">
+                        <div class="progress-bar bg-success" 
+                             [style.width.%]="studentInsights.latestAnalysis.behavioralInsights.motivation">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="behavior-item">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="behavior-name">🤝 Peer Interaction</span>
+                    <div class="behavior-score">
+                      <span class="score">{{ studentInsights.latestAnalysis.behavioralInsights.socialSkills }}%</span>
+                      <div class="progress ms-2" style="width: 100px;">
+                        <div class="progress-bar bg-primary" 
+                             [style.width.%]="studentInsights.latestAnalysis.behavioralInsights.socialSkills">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="behavioral-summary mt-3">
+                <div class="alert alert-light">
+                  <strong>Behavioral Pattern:</strong> {{ studentInsights.latestAnalysis.behavioralInsights.summary }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Personalized Recommendations -->
+        <div class="col-lg-6 mb-4">
+          <div class="analysis-card recommendations">
+            <div class="card-header">
+              <h4>💡 {{ getLanguageSpecificText('personalizedRecommendations') }}</h4>
+            </div>
+            <div class="card-body">
+              <div class="recommendations-list" *ngIf="studentInsights.latestAnalysis.personalizedRecommendations?.recommendations">
+                <div class="recommendation-item" 
+                     *ngFor="let rec of studentInsights.latestAnalysis.personalizedRecommendations.recommendations; let i = index">
+                  <div class="recommendation-header">
+                    <span class="recommendation-priority" 
+                          [class]="'priority-' + rec.priority">
+                      {{ rec.priority }}
+                    </span>
+                    <h6 class="recommendation-title">{{ rec.title }}</h6>
+                  </div>
+                  <p class="recommendation-description">{{ rec.description }}</p>
+                  <div class="recommendation-actions" *ngIf="rec.actionItems">
+                    <h6>Action Items:</h6>
+                    <ul class="action-list">
+                      <li *ngFor="let action of rec.actionItems">{{ action }}</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="no-recommendations" *ngIf="!studentInsights.latestAnalysis.personalizedRecommendations?.recommendations?.length">
+                <div class="text-center text-muted">
+                  <i class="fas fa-trophy fa-2x mb-2"></i>
+                  <p>Great job! No specific recommendations at this time.</p>
+                  <small>Keep up the excellent work!</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cultural Considerations and Next Steps -->
+      <div class="row">
+        
+        <!-- Cultural Considerations -->
+        <div class="col-lg-6 mb-4">
+          <div class="analysis-card cultural-considerations">
+            <div class="card-header">
+              <h4>🌍 {{ getLanguageSpecificText('culturalConsiderations') }}</h4>
+            </div>
+            <div class="card-body">
+              <div class="cultural-info" *ngIf="studentInsights.latestAnalysis.culturalConsiderations">
+                <div class="cultural-item">
+                  <strong>🏛️ Region:</strong> {{ studentInsights.contextualInfo?.region }}
+                </div>
+                <div class="cultural-item">
+                  <strong>🏠 Family Language:</strong> {{ studentInsights.contextualInfo?.familyLanguage }}
+                </div>
+                <div class="cultural-item">
+                  <strong>💻 Technology Access:</strong> 
+                  <span [class]="studentInsights.contextualInfo?.technologyAccess ? 'text-success' : 'text-warning'">
+                    {{ studentInsights.contextualInfo?.technologyAccess ? 'Available' : 'Limited' }}
+                  </span>
+                </div>
+                <div class="cultural-item">
+                  <strong>📚 Study Environment:</strong> {{ studentInsights.contextualInfo?.studyEnvironment }}
+                </div>
+                
+                <div class="cultural-recommendations mt-3">
+                  <div class="alert alert-info">
+                    <strong>Cultural Insights:</strong> 
+                    {{ studentInsights.latestAnalysis.culturalConsiderations.recommendations }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="col-lg-6 mb-4">
+          <div class="analysis-card next-steps">
+            <div class="card-header">
+              <h4>🎯 {{ getLanguageSpecificText('nextSteps') }}</h4>
+            </div>
+            <div class="card-body">
+              <div class="next-steps-timeline">
+                <div class="timeline-item immediate">
+                  <div class="timeline-badge bg-danger">1</div>
+                  <div class="timeline-content">
+                    <h6>Immediate Actions (This Week)</h6>
+                    <ul>
+                      <li>Focus on {{ dashboardStats.weekestSubject }} improvement</li>
+                      <li>Practice language skills daily</li>
+                      <li>Complete pending homework assignments</li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <div class="timeline-item short-term">
+                  <div class="timeline-badge bg-warning">2</div>
+                  <div class="timeline-content">
+                    <h6>Short-term Goals (This Month)</h6>
+                    <ul>
+                      <li>Improve class participation by 20%</li>
+                      <li>Strengthen weak subject areas</li>
+                      <li>Develop better study habits</li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <div class="timeline-item long-term">
+                  <div class="timeline-badge bg-success">3</div>
+                  <div class="timeline-content">
+                    <h6>Long-term Objectives (This Semester)</h6>
+                    <ul>
+                      <li>Achieve overall score of 85%</li>
+                      <li>Master trilingual communication</li>
+                      <li>Develop independent learning skills</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="progress-tracking mt-3">
+                <h6>Progress Tracking:</h6>
+                <small class="text-muted">Last updated: {{ formatDate(dashboardStats.lastUpdate) }}</small>
+                <div class="progress mt-2">
+                  <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                       style="width: 65%">
+                    65% towards semester goals
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Chart -->
+      <div class="row">
+        <div class="col-12 mb-4">
+          <div class="analysis-card progress-chart">
+            <div class="card-header">
+              <h4>📈 Progress Over Time</h4>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="progressChart" width="800" height="300"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-section">
+    <div class="container">
+      <div class="text-center">
+        <p class="footer-text">
+          🤖 Powered by AI | 📊 Tunisia Education Analytics | 🌟 Personalized Learning
+        </p>
+        <small class="text-muted">
+          This analysis is generated using advanced AI algorithms considering Tunisia's educational context
+        </small>
+      </div>
+    </div>
+  </div>
+</div>

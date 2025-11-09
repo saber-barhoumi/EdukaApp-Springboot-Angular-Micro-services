@@ -1,0 +1,287 @@
+services:
+  # Keycloak - OAuth2 Authentication Server
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.0
+    container_name: keycloak-eduka
+    restart: always
+    command: start-dev
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HTTP_PORT=8080
+      - KC_HOSTNAME_STRICT=false
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak-data:/opt/keycloak/data
+    networks:
+      - eduka-network
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # Eureka Server - Service Discovery
+  eureka-server:
+    build: ./infrastructure/eureka-server
+    image: saberbarhoumi11/eureka-server:1.0
+    container_name: eureka-server-eduka
+    ports:
+      - "8761:8761"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+    networks:
+      - eduka-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8761/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # Config Server - Centralized Configuration Management
+  config-server:
+    build: ./infrastructure/config-server
+    image: saberbarhoumi11/config-server:1.0
+    container_name: config-server-eduka
+    ports:
+      - "8885:8885"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_PROFILES_ACTIVE=native
+    networks:
+      - eduka-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8885/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # API Gateway - Secured with Keycloak OAuth2
+  api-gateway:
+    build: ./infrastructure/api-gateway
+    image: saberbarhoumi11/api-gateway:1.0
+    container_name: api-gateway-eduka
+    ports:
+      - "8888:8888"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/Eduka-realm
+    networks:
+      - eduka-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8888/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # RabbitMQ - Message Broker for Async Notifications
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-eduka
+    restart: always
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - eduka-network
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # Notification Service - RabbitMQ + Feign Client
+  notification-service:
+    build: ./microservices/notification-service
+    image: saberbarhoumi11/notification-service:1.0
+    container_name: notification-service-eduka
+    ports:
+      - "8086:8086"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
+    networks:
+      - eduka-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8086/api/notifications/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # Restaurant Management Service - H2 Database
+  restaurant-management-service:
+    build: ./microservices/restaurant-management-service
+    image: saberbarhoumi11/restaurant-service:1.0
+    container_name: restaurant-service-eduka
+    ports:
+      - "8083:8083"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      notification-service:
+        condition: service_healthy
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:h2:file:./data/restaurant_management_db
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    volumes:
+      - restaurant-data:/app/data
+    networks:
+      - eduka-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8083/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # Angular Frontend - Proxied to API Gateway
+  eduka-frontend:
+    build:
+      context: ./eduka-frontend
+      dockerfile: Dockerfile
+    image: saberbarhoumi11/frontend:1.0
+    container_name: eduka-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - eduka-network
+
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb-eduka
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=eduka-users
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - eduka-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # User Management Service (Node.js)
+  user-management-nodejs:
+    build: ./user-management-nodejs
+    image: saberbarhoumi11/user-management-nodejs:1.0
+    container_name: user-management-nodejs-eduka
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/eduka-users
+      - JWT_SECRET=your_jwt_secret_here_change_in_production
+      - PORT=3000
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - eduka-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/auth/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # MySQL Database for Admin Management Service
+  mysqldb:
+    image: mysql:8.0
+    container_name: mysql-eduka
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=admin_management_db
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - eduka-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Admin Management Service - MySQL Database + OpenFeign
+  admin-management-service:
+    build: ./microservices/admin-management-service
+    image: saberbarhoumi11/admin-management-service:1.0
+    container_name: admin-management-service-eduka
+    ports:
+      - "8087:8087"
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      user-management-nodejs:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/admin_management_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - USER_SERVICE_URL=http://user-management-nodejs:3000
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/Eduka-realm
+    networks:
+      - eduka-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8087/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+volumes:
+  restaurant-data:
+  keycloak-data:
+  rabbitmq-data:
+  mongodb-data:
+  mysql-data:
+
+networks:
+  eduka-network:
+    driver: bridge

@@ -1,0 +1,299 @@
+<!-- Breadcrumb -->
+<div class="breadcrumb-wrapper">
+  <div class="container">
+    <div class="page-heading">
+      <h1>Campus Restaurants & Orders</h1>
+      <div class="page-header">
+        <ul class="breadcrumb-items">
+          <li><a routerLink="/">Home</a></li>
+          <li><i class="far fa-chevron-right"></i></li>
+          <li>Restaurants</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Restaurant & Orders Area -->
+<div class="event-area py-120">
+  <div class="container">
+    <!-- Tab Navigation -->
+    <div class="row mb-5">
+      <div class="col-lg-12">
+        <div class="site-heading text-center">
+          <span class="site-title-tagline"><i class="far fa-book-open-reader"></i> Campus Dining</span>
+          <h2 class="site-title">Discover Our <span>Restaurants</span></h2>
+          <p>Explore delicious food options and track your orders</p>
+        </div>
+        
+        <!-- Tab Buttons -->
+        <div class="text-center mt-4">
+          <div class="btn-group" role="group">
+            <button 
+              type="button" 
+              class="btn" 
+              [class.btn-primary]="activeTab === 'restaurants'"
+              [class.btn-outline-primary]="activeTab !== 'restaurants'"
+              (click)="switchTab('restaurants')"
+            >
+              <i class="far fa-utensils"></i> Browse Restaurants
+            </button>
+            <button 
+              type="button" 
+              class="btn" 
+              [class.btn-primary]="activeTab === 'orders'"
+              [class.btn-outline-primary]="activeTab !== 'orders'"
+              (click)="switchTab('orders')"
+            >
+              <i class="far fa-shopping-bag"></i> My Orders ({{ userOrders.length }})
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESTAURANTS TAB -->
+    <div *ngIf="activeTab === 'restaurants'">
+      <!-- Search Bar -->
+      <div class="row mb-4">
+        <div class="col-lg-6 mx-auto">
+          <div class="search-box">
+            <div class="input-group">
+              <input 
+                type="text" 
+                class="form-control" 
+                placeholder="Search restaurants..." 
+                [(ngModel)]="searchTerm"
+                (keyup)="filterRestaurants()"
+              />
+              <button class="btn btn-primary" type="button">
+                <i class="far fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3">
+          <select 
+            class="form-select" 
+            [(ngModel)]="filterType"
+            (change)="filterRestaurants()"
+          >
+            <option value="">All Types</option>
+            <option *ngFor="let type of restaurantTypes" [value]="type">{{ type }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Restaurant Carousel -->
+      <div class="row" *ngIf="filteredRestaurants.length > 0">
+        <div class="col-lg-12">
+          <div class="event-slider owl-carousel owl-theme">
+            <div class="event-item" *ngFor="let restaurant of filteredRestaurants">
+              <div class="event-location">
+                <span>
+                  <i class="far fa-map-marker-alt"></i> {{ restaurant.address }}
+                </span>
+              </div>
+              <div class="event-img">
+                <img 
+                  [src]="restaurant.imageUrl || getDefaultImage()" 
+                  [alt]="restaurant.name"
+                  style="width: 100%; height: 250px; object-fit: cover;"
+                />
+              </div>
+              <div class="event-info">
+                <div class="event-meta">
+                  <span class="event-date">
+                    <i class="far fa-utensils"></i> {{ restaurant.type }}
+                  </span>
+                  <span class="event-time" *ngIf="restaurant.isActive">
+                    <i class="far fa-clock"></i> {{ restaurant.openingHours || 'Open Now' }}
+                  </span>
+                </div>
+                <h4 class="event-title">
+                  <a (click)="viewRestaurantDetails(restaurant.id!)" style="cursor: pointer;">
+                    {{ restaurant.name }}
+                  </a>
+                </h4>
+                <p>{{ restaurant.description || 'Delicious food awaits you at this amazing restaurant.' }}</p>
+                <div class="event-btn">
+                  <a (click)="viewRestaurantDetails(restaurant.id!)" class="theme-btn" style="cursor: pointer;">
+                    View Menu
+                    <i class="fas fa-arrow-right-long"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="row" *ngIf="filteredRestaurants.length === 0">
+        <div class="col-lg-12">
+          <div class="text-center py-5">
+            <i class="far fa-info-circle" style="font-size: 4rem; color: #ff5722;"></i>
+            <h3 class="mt-3">No restaurants found</h3>
+            <p class="text-muted">Try adjusting your search or filter criteria</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY ORDERS TAB -->
+    <div *ngIf="activeTab === 'orders'">
+      <!-- Filter Bar -->
+      <div class="row mb-4">
+        <div class="col-lg-4 mx-auto">
+          <select 
+            class="form-select" 
+            [(ngModel)]="orderStatusFilter"
+            (change)="filterOrders()"
+          >
+            <option value="">All Statuses</option>
+            <option *ngFor="let status of orderStatuses" [value]="status">{{ status }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Orders List -->
+      <div class="row" *ngIf="filteredOrders.length > 0">
+        <div class="col-lg-12">
+          <div class="row">
+            <div class="col-lg-6 mb-4" *ngFor="let order of filteredOrders">
+              <div class="card order-card">
+                <div class="card-header bg-primary text-white">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                      <i class="far fa-receipt"></i> Order #{{ order.id }}
+                    </h5>
+                    <span class="badge" [ngClass]="getStatusBadgeClass(order.status!)">
+                      {{ order.status }}
+                    </span>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <!-- Restaurant Info -->
+                  <div class="mb-3" *ngIf="order.restaurant">
+                    <h6 class="text-primary">
+                      <i class="far fa-store"></i> {{ order.restaurant.name }}
+                    </h6>
+                    <small class="text-muted">{{ order.restaurant.address }}</small>
+                  </div>
+
+                  <!-- Order Items -->
+                  <div class="order-items mb-3">
+                    <h6 class="mb-2">Items:</h6>
+                    <ul class="list-unstyled">
+                      <li *ngFor="let item of order.items" class="mb-1">
+                        <i class="far fa-check-circle text-success"></i>
+                        {{ item.name }} - ${{ item.price }}
+                      </li>
+                    </ul>
+                  </div>
+
+                  <!-- Order Details -->
+                  <div class="order-details">
+                    <div class="row">
+                      <div class="col-6">
+                        <small class="text-muted">Total Amount:</small>
+                        <p class="mb-1"><strong>${{ order.totalAmount }}</strong></p>
+                      </div>
+                      <div class="col-6">
+                        <small class="text-muted">Order Date:</small>
+                        <p class="mb-1">{{ order.createdAt | date:'short' }}</p>
+                      </div>
+                    </div>
+                    <div *ngIf="order.deliveryAddress" class="mt-2">
+                      <small class="text-muted">Delivery Address:</small>
+                      <p class="mb-1">{{ order.deliveryAddress }}</p>
+                    </div>
+                    <div *ngIf="order.notes" class="mt-2">
+                      <small class="text-muted">Notes:</small>
+                      <p class="mb-1">{{ order.notes }}</p>
+                    </div>
+                  </div>
+
+                  <!-- Action Buttons -->
+                  <div class="d-flex justify-content-between mt-3">
+                    <button 
+                      class="btn btn-sm btn-outline-primary"
+                      (click)="viewOrderDetails(order.id!)"
+                    >
+                      <i class="far fa-eye"></i> View Details
+                    </button>
+                    <button 
+                      class="btn btn-sm btn-danger"
+                      *ngIf="order.status === 'PENDING' || order.status === 'CONFIRMED'"
+                      (click)="cancelOrder(order.id!)"
+                    >
+                      <i class="far fa-times"></i> Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="row" *ngIf="filteredOrders.length === 0">
+        <div class="col-lg-12">
+          <div class="text-center py-5">
+            <i class="far fa-shopping-bag" style="font-size: 4rem; color: #ff5722;"></i>
+            <h3 class="mt-3">No orders found</h3>
+            <p class="text-muted">
+              <span *ngIf="!currentUserId">Please log in to view your orders</span>
+              <span *ngIf="currentUserId && userOrders.length === 0">You haven't placed any orders yet</span>
+              <span *ngIf="currentUserId && userOrders.length > 0 && filteredOrders.length === 0">
+                No orders match the selected filter
+              </span>
+            </p>
+            <a routerLink="/restaurants" class="theme-btn mt-3" *ngIf="currentUserId">
+              <i class="far fa-utensils"></i> Browse Restaurants
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .order-card {
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .order-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+
+  .badge-warning {
+    background-color: #ffc107;
+    color: #000;
+  }
+
+  .badge-info {
+    background-color: #17a2b8;
+  }
+
+  .badge-primary {
+    background-color: #007bff;
+  }
+
+  .badge-success {
+    background-color: #28a745;
+  }
+
+  .badge-danger {
+    background-color: #dc3545;
+  }
+
+  .badge-secondary {
+    background-color: #6c757d;
+  }
+</style>

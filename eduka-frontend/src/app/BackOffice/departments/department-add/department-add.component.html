@@ -1,0 +1,48 @@
+<div class="container">
+  <h2>Add New Department</h2>
+  <form (ngSubmit)="onSubmit()" #deptForm="ngForm">
+    <div class="mb-3">
+      <label for="departmentName" class="form-label">Department Name</label>
+      <input type="text" class="form-control" id="departmentName" name="departmentName"
+             [(ngModel)]="department.departmentName" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="departmentCode" class="form-label">Department Code</label>
+      <input type="text" class="form-control" id="departmentCode" name="departmentCode"
+             [(ngModel)]="department.departmentCode" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea class="form-control" id="description" name="description"
+                [(ngModel)]="department.description" required></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="location" class="form-label">Location</label>
+      <input type="text" class="form-control" id="location" name="location"
+             [(ngModel)]="department.location" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="headOfDepartment" class="form-label">Head of Department</label>
+      <input type="text" class="form-control" id="headOfDepartment" name="headOfDepartment"
+             [(ngModel)]="department.headOfDepartment" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="academicProgramId" class="form-label">Academic Program</label>
+      <select class="form-control" id="academicProgramId" name="academicProgramId"
+              [(ngModel)]="department.academicProgramId" required>
+        <option value="">Select Academic Program</option>
+        <option *ngFor="let program of academicPrograms" [value]="program.id">
+          {{ program.programName }}
+        </option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary me-2" [disabled]="!deptForm.form.valid">Save</button>
+    <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  </form>
+</div>

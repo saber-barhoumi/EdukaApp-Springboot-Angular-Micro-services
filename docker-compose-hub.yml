@@ -1,0 +1,134 @@
+services:
+  # Keycloak - OAuth2 Authentication Server
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.0
+    container_name: keycloak-eduka
+    restart: always
+    command: start-dev
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HTTP_PORT=8080
+      - KC_HOSTNAME_STRICT=false
+    ports:
+      - "8080:8080"
+    networks:
+      - eduka-network
+
+  # Eureka Server - Service Discovery
+  eureka-server:
+    image: saberbarhoumi11/eureka-server:1.0
+    container_name: eureka-server-eduka
+    ports:
+      - "8761:8761"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+    networks:
+      - eduka-network
+
+  # API Gateway - Secured with Keycloak OAuth2
+  api-gateway:
+    image: saberbarhoumi11/api-gateway:1.0
+    container_name: api-gateway-eduka
+    ports:
+      - "8888:8888"
+    depends_on:
+      - eureka-server
+      - keycloak
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/Eduka-realm
+    networks:
+      - eduka-network
+
+  # Restaurant Management Service - H2 Database
+  restaurant-management-service:
+    image: saberbarhoumi11/restaurant-service:1.0
+    container_name: restaurant-service-eduka
+    ports:
+      - "8083:8083"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:h2:file:./data/restaurant_management_db
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    networks:
+      - eduka-network
+
+  # Angular Frontend - Proxied to API Gateway
+  eduka-frontend:
+    image: saberbarhoumi11/frontend:1.0
+    container_name: eduka-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - eduka-network
+
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb-eduka
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=eduka-users
+    networks:
+      - eduka-network
+
+  # User Management Service (Node.js)
+  user-management-nodejs:
+    image: saberbarhoumi11/user-management-nodejs:1.0
+    container_name: user-management-nodejs-eduka
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/eduka-users
+      - JWT_SECRET=your_jwt_secret_here_change_in_production
+      - PORT=3000
+    depends_on:
+      - mongodb
+    networks:
+      - eduka-network
+
+  # MySQL Database for Admin Management Service
+  mysqldb:
+    image: mysql:8.0
+    container_name: mysql-eduka
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=admin_management_db
+    networks:
+      - eduka-network
+
+  # Admin Management Service - MySQL Database + OpenFeign
+  admin-management-service:
+    image: saberbarhoumi11/admin-management-service:1.0
+    container_name: admin-management-service-eduka
+    ports:
+      - "8087:8087"
+    depends_on:
+      - mysqldb
+      - eureka-server
+      - user-management-nodejs
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/admin_management_db?createDatabaseIfNotExist=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - USER_SERVICE_URL=http://user-management-nodejs:3000
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - eduka-network
+
+networks:
+  eduka-network:
+    driver: bridge

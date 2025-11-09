@@ -1,0 +1,548 @@
+<div class="container-fluid mt-4">
+  <!-- Page Header -->
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">
+        <i class="bi bi-building"></i> Restaurant Management Dashboard
+      </h2>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <ul class="nav nav-tabs mb-4" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button 
+        class="nav-link active" 
+        id="restaurants-tab" 
+        data-bs-toggle="tab" 
+        data-bs-target="#restaurants" 
+        type="button" 
+        role="tab"
+        (click)="activeTab = 'restaurants'"
+      >
+        <i class="bi bi-shop"></i> Restaurants
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button 
+        class="nav-link" 
+        id="orders-tab" 
+        data-bs-toggle="tab" 
+        data-bs-target="#orders" 
+        type="button" 
+        role="tab"
+        (click)="activeTab = 'orders'; loadOrders()"
+      >
+        <i class="bi bi-receipt"></i> Orders
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button 
+        class="nav-link" 
+        id="users-tab" 
+        data-bs-toggle="tab" 
+        data-bs-target="#users" 
+        type="button" 
+        role="tab"
+        (click)="activeTab = 'users'; loadUsers()"
+      >
+        <i class="bi bi-people"></i> User Assignments
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+    <!-- ===================== RESTAURANTS TAB ===================== -->
+    <div class="tab-pane fade show active" id="restaurants" role="tabpanel">
+      <div class="card">
+        <div class="card-header bg-secondary text-white">
+          <h4 class="mb-0">Manage Restaurants</h4>
+        </div>
+        <div class="card-body">
+          <!-- Search and Filter Section -->
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Search restaurants..."
+                  [(ngModel)]="searchTerm"
+                  (keyup)="filterRestaurants()"
+                />
+              </div>
+            </div>
+            <div class="col-md-3">
+              <select
+                class="form-select"
+                [(ngModel)]="filterType"
+                (change)="filterRestaurants()"
+              >
+                <option value="">All Types</option>
+                <option *ngFor="let type of getRestaurantTypes()" [value]="type">
+                  {{ type }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-5 text-end">
+              <button class="btn btn-success" (click)="openCreateModal()">
+                <i class="bi bi-plus-circle"></i> Add New Restaurant
+              </button>
+            </div>
+          </div>
+
+          <!-- Restaurants Table -->
+          <div class="table-responsive">
+            <table class="table table-hover table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Address</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let restaurant of filteredRestaurants">
+                  <td>{{ restaurant.id }}</td>
+                  <td>
+                    <strong>{{ restaurant.name }}</strong>
+                  </td>
+                  <td>
+                    <span class="badge bg-info">{{ restaurant.type }}</span>
+                  </td>
+                  <td>{{ restaurant.address }}</td>
+                  <td>{{ restaurant.phoneNumber }}</td>
+                  <td>{{ restaurant.email }}</td>
+                  <td>
+                    <span
+                      class="badge"
+                      [ngClass]="restaurant.isActive ? 'bg-success' : 'bg-secondary'"
+                      style="cursor: pointer"
+                      (click)="toggleStatus(restaurant)"
+                    >
+                      {{ restaurant.isActive ? 'Active' : 'Inactive' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <button
+                        class="btn btn-sm btn-primary"
+                        (click)="openEditModal(restaurant)"
+                        title="Edit"
+                      >
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <button
+                        class="btn btn-sm btn-danger"
+                        (click)="deleteRestaurant(restaurant.id!)"
+                        title="Delete"
+                      >
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="filteredRestaurants.length === 0">
+                  <td colspan="8" class="text-center text-muted py-4">
+                    No restaurants found
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== ORDERS TAB ===================== -->
+    <div class="tab-pane fade" id="orders" role="tabpanel">
+      <!-- Statistics Cards -->
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="card bg-primary text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h3 class="mb-0">{{ totalOrders }}</h3>
+                  <small>Total Orders</small>
+                </div>
+                <i class="bi bi-receipt fs-1"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-success text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h3 class="mb-0">\${{ totalRevenue.toFixed(2) }}</h3>
+                  <small>Total Revenue</small>
+                </div>
+                <i class="bi bi-currency-dollar fs-1"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-warning text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h3 class="mb-0">{{ pendingOrders }}</h3>
+                  <small>Pending Orders</small>
+                </div>
+                <i class="bi bi-hourglass-split fs-1"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-info text-white">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <h3 class="mb-0">{{ completedOrders }}</h3>
+                  <small>Completed</small>
+                </div>
+                <i class="bi bi-check-circle fs-1"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders Table -->
+      <div class="card">
+        <div class="card-header bg-secondary text-white">
+          <h4 class="mb-0">Manage Orders</h4>
+        </div>
+        <div class="card-body">
+          <!-- Filters -->
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Search orders..."
+                [(ngModel)]="orderSearchTerm"
+                (keyup)="filterOrders()"
+              />
+            </div>
+            <div class="col-md-3">
+              <select
+                class="form-select"
+                [(ngModel)]="filterStatus"
+                (change)="filterOrders()"
+              >
+                <option value="">All Statuses</option>
+                <option *ngFor="let status of orderStatuses" [value]="status">
+                  {{ status }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <select
+                class="form-select"
+                [(ngModel)]="filterRestaurantId"
+                (change)="filterOrders()"
+              >
+                <option [ngValue]="null">All Restaurants</option>
+                <option *ngFor="let restaurant of restaurants" [value]="restaurant.id">
+                  {{ restaurant.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Orders Table -->
+          <div class="table-responsive">
+            <table class="table table-hover table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>Order ID</th>
+                  <th>User ID</th>
+                  <th>Restaurant</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let order of filteredOrders">
+                  <td><strong>#{{ order.id }}</strong></td>
+                  <td>{{ order.userId }}</td>
+                  <td>{{ getRestaurantName(order.restaurant?.id) }}</td>
+                  <td><strong>\${{ order.totalAmount?.toFixed(2) }}</strong></td>
+                  <td>
+                    <span class="badge" [ngClass]="getStatusClass(order.status || '')">
+                      {{ order.status }}
+                    </span>
+                  </td>
+                  <td>{{ order.orderDate | date: 'short' }}</td>
+                  <td>
+                    <button
+                      class="btn btn-sm btn-info"
+                      (click)="viewOrderDetails(order)"
+                      title="View Details"
+                    >
+                      <i class="bi bi-eye"></i>
+                    </button>
+                    <select
+                      class="form-select form-select-sm d-inline-block w-auto ms-2"
+                      [(ngModel)]="order.status"
+                      (change)="updateOrderStatus(order)"
+                    >
+                      <option *ngFor="let status of orderStatuses" [value]="status">
+                        {{ status }}
+                      </option>
+                    </select>
+                  </td>
+                </tr>
+                <tr *ngIf="filteredOrders.length === 0">
+                  <td colspan="7" class="text-center text-muted py-4">
+                    No orders found
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== USER ASSIGNMENTS TAB ===================== -->
+    <div class="tab-pane fade" id="users" role="tabpanel">
+      <div class="card">
+        <div class="card-header bg-secondary text-white">
+          <h4 class="mb-0">Manage User-Restaurant Assignments</h4>
+        </div>
+        <div class="card-body">
+          <!-- Restaurant Selector -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <label class="form-label"><strong>Select Restaurant:</strong></label>
+              <select
+                class="form-select form-select-lg"
+                [(ngModel)]="selectedRestaurantId"
+                (change)="loadUsersForRestaurant()"
+              >
+                <option [ngValue]="null">-- Choose a Restaurant --</option>
+                <option *ngFor="let restaurant of restaurants" [value]="restaurant.id">
+                  {{ restaurant.name }} ({{ restaurant.type }})
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Users Table -->
+          <div *ngIf="selectedRestaurantId" class="table-responsive">
+            <h5 class="mb-3">
+              Users for: <strong>{{ getRestaurantName(selectedRestaurantId) }}</strong>
+            </h5>
+            <table class="table table-hover">
+              <thead class="table-dark">
+                <tr>
+                  <th>User ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let user of allUsers">
+                  <td>{{ user.id }}</td>
+                  <td>{{ user.firstName }} {{ user.lastName }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>
+                    <span class="badge bg-secondary">{{ user.role }}</span>
+                  </td>
+                  <td>
+                    <span
+                      class="badge"
+                      [ngClass]="isUserAssigned(user.id!) ? 'bg-success' : 'bg-warning'"
+                    >
+                      {{ isUserAssigned(user.id!) ? 'Assigned' : 'Not Assigned' }}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      class="btn btn-sm"
+                      [ngClass]="isUserAssigned(user.id!) ? 'btn-danger' : 'btn-success'"
+                      (click)="toggleUserAssignment(user.id!)"
+                    >
+                      <i
+                        class="bi"
+                        [ngClass]="isUserAssigned(user.id!) ? 'bi-x-circle' : 'bi-plus-circle'"
+                      ></i>
+                      {{ isUserAssigned(user.id!) ? 'Unassign' : 'Assign' }}
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="allUsers.length === 0">
+                  <td colspan="6" class="text-center text-muted">No users available</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="!selectedRestaurantId" class="text-center text-muted py-5">
+            <i class="bi bi-arrow-up-circle fs-1"></i>
+            <p class="mt-2">Please select a restaurant to manage user assignments</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create/Edit Restaurant Modal -->
+<div
+  class="modal fade"
+  [class.show]="showModal"
+  [style.display]="showModal ? 'block' : 'none'"
+  tabindex="-1"
+  *ngIf="showModal"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          {{ isEditing ? 'Edit Restaurant' : 'Create New Restaurant' }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          (click)="closeModal()"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Restaurant Name *</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="newRestaurant.name"
+                name="name"
+                required
+              />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Type *</label>
+              <select
+                class="form-select"
+                [(ngModel)]="newRestaurant.type"
+                name="type"
+                required
+              >
+                <option value="">Select Type</option>
+                <option *ngFor="let type of getRestaurantTypes()" [value]="type">
+                  {{ type }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12 mb-3">
+              <label class="form-label">Address</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="newRestaurant.address"
+                name="address"
+              />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Phone Number</label>
+              <input
+                type="tel"
+                class="form-control"
+                [(ngModel)]="newRestaurant.phoneNumber"
+                name="phoneNumber"
+              />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Email</label>
+              <input
+                type="email"
+                class="form-control"
+                [(ngModel)]="newRestaurant.email"
+                name="email"
+              />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Opening Hours</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="newRestaurant.openingHours"
+                name="openingHours"
+                placeholder="e.g., 8:00 AM - 10:00 PM"
+              />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Image URL</label>
+              <input
+                type="text"
+                class="form-control"
+                [(ngModel)]="newRestaurant.imageUrl"
+                name="imageUrl"
+              />
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea
+              class="form-control"
+              rows="3"
+              [(ngModel)]="newRestaurant.description"
+              name="description"
+            ></textarea>
+          </div>
+
+          <div class="form-check">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              [(ngModel)]="newRestaurant.isActive"
+              name="isActive"
+              id="isActive"
+            />
+            <label class="form-check-label" for="isActive">
+              Active
+            </label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="saveRestaurant()">
+          {{ isEditing ? 'Update' : 'Create' }} Restaurant
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="showModal" *ngIf="showModal"></div>

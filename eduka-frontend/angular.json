@@ -1,0 +1,144 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "eduka-frontend": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/eduka-frontend",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "polyfills": [],
+            "tsConfig": "tsconfig.app.json",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/assets/FrontOffice/css/bootstrap.min.css",
+              "src/assets/FrontOffice/css/all-fontawesome.min.css",
+              "src/assets/FrontOffice/css/animate.min.css",
+              "src/assets/FrontOffice/css/magnific-popup.min.css",
+              "src/assets/FrontOffice/css/owl.carousel.min.css",
+              "src/assets/FrontOffice/css/style.css",
+              "src/styles.css"
+            ],
+            "scripts": [
+              "src/assets/FrontOffice/js/jquery-3.7.1.min.js",
+              "src/assets/FrontOffice/js/modernizr.min.js",
+              "src/assets/FrontOffice/js/bootstrap.bundle.min.js",
+              "src/assets/FrontOffice/js/imagesloaded.pkgd.min.js",
+              "src/assets/FrontOffice/js/jquery.magnific-popup.min.js",
+              "src/assets/FrontOffice/js/isotope.pkgd.min.js",
+              "src/assets/FrontOffice/js/jquery.appear.min.js",
+              "src/assets/FrontOffice/js/jquery.easing.min.js",
+              "src/assets/FrontOffice/js/owl.carousel.min.js",
+              "src/assets/FrontOffice/js/counter-up.js",
+              "src/assets/FrontOffice/js/wow.min.js",
+              "src/assets/FrontOffice/js/main.js",
+              "src/assets/BackOffice/js/sidebar.js",
+              "src/assets/BackOffice/js/script.js"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "eduka-frontend:build:production"
+            },
+            "development": {
+              "buildTarget": "eduka-frontend:build:development"
+              },
+              "proxy": {
+                "buildTarget": "eduka-frontend:build:development",
+                "proxyConfig": "proxy.conf.json"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "buildTarget": "eduka-frontend:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/test.ts",
+            "polyfills": [],
+            "tsConfig": "tsconfig.spec.json",
+            "karmaConfig": "karma.conf.js",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/assets/FrontOffice/css/bootstrap.min.css",
+              "src/assets/FrontOffice/css/all-fontawesome.min.css",
+              "src/assets/FrontOffice/css/animate.min.css",
+              "src/assets/FrontOffice/css/magnific-popup.min.css",
+              "src/assets/FrontOffice/css/owl.carousel.min.css",
+              "src/assets/FrontOffice/css/style.css",
+              "src/styles.css"
+            ],
+            "scripts": [
+              "src/assets/FrontOffice/js/jquery-3.7.1.min.js",
+              "src/assets/FrontOffice/js/modernizr.min.js",
+              "src/assets/FrontOffice/js/bootstrap.bundle.min.js",
+              "src/assets/FrontOffice/js/imagesloaded.pkgd.min.js",
+              "src/assets/FrontOffice/js/jquery.magnific-popup.min.js",
+              "src/assets/FrontOffice/js/isotope.pkgd.min.js",
+              "src/assets/FrontOffice/js/jquery.appear.min.js",
+              "src/assets/FrontOffice/js/jquery.easing.min.js",
+              "src/assets/FrontOffice/js/owl.carousel.min.js",
+              "src/assets/FrontOffice/js/counter-up.js",
+              "src/assets/FrontOffice/js/wow.min.js",
+              "src/assets/FrontOffice/js/main.js",
+              "src/assets/BackOffice/js/sidebar.js",
+              "src/assets/BackOffice/js/script.js"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "analytics": false
+  }
+}

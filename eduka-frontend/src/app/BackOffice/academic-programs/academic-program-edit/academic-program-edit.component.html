@@ -1,0 +1,37 @@
+<div class="container">
+  <h2>Edit Academic Program</h2>
+  <form (ngSubmit)="onSubmit()" #programForm="ngForm">
+    <div class="mb-3">
+      <label for="programName" class="form-label">Program Name</label>
+      <input type="text" class="form-control" id="programName" name="programName" 
+             [(ngModel)]="program.programName" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="programCode" class="form-label">Program Code</label>
+      <input type="text" class="form-control" id="programCode" name="programCode" 
+             [(ngModel)]="program.programCode" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea class="form-control" id="description" name="description" 
+                [(ngModel)]="program.description" required></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label for="duration" class="form-label">Duration</label>
+      <input type="text" class="form-control" id="duration" name="duration" 
+             [(ngModel)]="program.duration" required>
+    </div>
+
+    <div class="mb-3 form-check">
+      <input type="checkbox" class="form-check-input" id="isActive" name="isActive" 
+             [(ngModel)]="program.isActive">
+      <label class="form-check-label" for="isActive">Active</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary me-2" [disabled]="!programForm.form.valid">Update</button>
+    <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  </form>
+</div>
