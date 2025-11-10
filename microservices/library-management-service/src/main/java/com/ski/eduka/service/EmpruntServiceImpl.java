@@ -9,8 +9,11 @@ import com.ski.eduka.repository.EmpruntRepository;
 import com.ski.eduka.repository.LivreRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -29,18 +32,32 @@ public class EmpruntServiceImpl implements empruntService {
     @Override
     public Emprunt addEmprunt(Long livreId,  String token) {
 
-        // 1️⃣ Décoder le JWT pour obtenir le userId
-        Jwt jwt = jwtDecoder.decode(token.replace("Bearer ", ""));
-        String userId = jwt.getClaimAsString("sub");
+        // ✅ 1️⃣ Récupérer le JWT depuis le SecurityContext
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // 2️⃣ Récupérer l’utilisateur via Feign si besoin (optionnel)
+        String userId = null;
+
+        // ✅ Vérifier le type d'authentification et extraire le userId
+        if (authentication instanceof JwtAuthenticationToken) {
+            JwtAuthenticationToken jwtAuth = (JwtAuthenticationToken) authentication;
+            Jwt jwt = jwtAuth.getToken();
+            userId = jwt.getClaimAsString("sub");
+
+            System.out.println("✅ JWT Token trouvé - User ID: " + userId);
+        } else {
+            System.out.println("❌ Type d'authentification: " + authentication.getClass().getName());
+            System.out.println("❌ Principal: " + authentication.getPrincipal());
+            throw new RuntimeException("Token JWT invalide ou manquant");
+        }
+
+        // 2️⃣ Récupérer l'utilisateur via Feign
         userrdto user = userClient.getUserById(userId, token);
 
         // 3️⃣ Vérifier que le livre existe
         Livre livre = livreRepository.findById(livreId)
                 .orElseThrow(() -> new RuntimeException("Livre non trouvé avec id: " + livreId));
 
-        // 4️⃣ Créer l’emprunt
+        // 4️⃣ Créer l'emprunt
         Emprunt emprunt = new Emprunt();
         emprunt.setLivre(livre);
         emprunt.setEtudiantId(Long.valueOf(user.getId()));

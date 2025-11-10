@@ -10,9 +10,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-// import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -26,28 +23,6 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
-    // TEMPORARILY DISABLED KEYCLOAK
-    // private final KeycloakJwtAuthenticationConverter keycloakJwtAuthenticationConverter;
-
-    public SecurityConfig() {
-        // TEMPORARILY DISABLED KEYCLOAK CONSTRUCTOR
-        // this.keycloakJwtAuthenticationConverter = keycloakJwtAuthenticationConverter;
-    }
-
-    /**
-     * Configure JWT Authentication Converter for Keycloak - TEMPORARILY DISABLED
-     */
-    /*
-    @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverterForKeycloak() {
-        log.info("Configuring JWT Authentication Converter for Keycloak");
-        
-        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(keycloakJwtAuthenticationConverter);
-        
-        return jwtAuthenticationConverter;
-    }
-    */
 
     /**
      * Password encoder bean
@@ -74,41 +49,33 @@ public class SecurityConfig {
     }
 
     /**
-     * Configure security - TEMPORARILY DISABLED AUTHENTICATION
+     * ✅ Configure security - JWT AUTHENTICATION ENABLED
      */
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
-        log.info("Configuring Security Filter Chain - AUTHENTICATION DISABLED");
-        
+        log.info("✅ Configuring Security Filter Chain - JWT AUTHENTICATION ENABLED");
+
         http
-                // Updated CSRF configuration
+                // Disable CSRF
                 .csrf(csrf -> csrf.disable())
 
-                // Updated CORS configuration
+                // Configure CORS
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // Updated session management
+                // Stateless session
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // TEMPORARILY DISABLED OAuth2 resource server configuration
-                /*
+                // ✅ ENABLE OAuth2 Resource Server with JWT
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt
-                                .jwtAuthenticationConverter(jwtAuthenticationConverterForKeycloak())))
-                */
+                        .jwt()
+                )
 
-                // Updated authorization configuration - PERMIT ALL FOR NOW
+                // ✅ Require authentication for all requests
                 .authorizeHttpRequests(authz -> authz
-                        .anyRequest().permitAll() // TEMPORARILY ALLOW ALL REQUESTS
+                        .anyRequest().authenticated()
                 );
 
         return http.build();
-    }
-
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        String jwkSetUri = "http://localhost:8080/realms/eduka/protocol/openid-connect/certs"; // ton URL Keycloak
-        return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
     }
 }
