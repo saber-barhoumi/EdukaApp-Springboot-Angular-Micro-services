@@ -36,7 +36,7 @@ When accessing microservices through the Gateway:
 
 1. **Navigate to Clients**:
    - In the left sidebar, click "Clients"
-   - Click "Create client"
+   - Click "Creaaaaaaaaaate client"
 
 2. **General Settings**:
    - **Client ID**: `api-gateway`
