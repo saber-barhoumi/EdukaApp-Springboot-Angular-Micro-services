@@ -1,39 +1,33 @@
-
-
-require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const userRoutes = require('./routes/userRoutes');
-const authRoutes = require('./routes/authRoutes');
+const mysql = require('mysql2');
+
+const PORT = 3000; // البورت اللي باش يشغل عليه السيرفر
+
+// إعداد الاتصال بـ MySQL
+const connection = mysql.createConnection({
+    host: 'localhost',      // أو IP السيرفر متاعك
+    user: 'root',           // اسم المستخدم متاع MySQL
+    password: '',           // كلمة السر
+    database: 'userdb'      // اسم قاعدة البيانات
+});
+
+// الاتصال بـ MySQL
+connection.connect(err => {
+    if (err) {
+        console.error('Error connecting to MySQL:', err);
+        process.exit(1);
+    }
+    console.log('Connected to MySQL database');
+});
 
 const app = express();
-app.use(cors({
-  origin: 'http://localhost:4200',
-  credentials: true
-}));
-app.use(express.json());
+app.use(express.json()); // باش نستقبل JSON في الريكوست
 
-
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
+// مثال route باش نشوفوا السيرفر شغال
+app.get('/', (req, res) => {
+    res.send('User management service is running!');
 });
 
-// Health check endpoint
-app.get('/api/auth/health', (req, res) => {
-  res.status(200).send('User Management Service is running!');
-});
-
-app.use('/api/users', userRoutes);
-app.use('/api/auth', authRoutes);
-
-// Error handler
-app.use((err, req, res, next) => {
-  res.status(500).json({ error: err.message });
-});
-
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`User management service running on port ${PORT}`);
+    console.log(`User management service running on port ${PORT}`);
 });
